@@ -5,6 +5,7 @@ module.exports = {
         library: "DSPlayground"
     },
 
+    mode: "development",
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
 
@@ -30,6 +31,12 @@ module.exports = {
         //     // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
         // ]
     },
+
+    watch: true, 
+    // watchOptions: {
+    //     aggregateTimeout: 200,
+    //     poll: 1000
+    // }
 
     // Other options...
 };

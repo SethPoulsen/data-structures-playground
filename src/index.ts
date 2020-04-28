@@ -14,7 +14,6 @@ export class DSPlayground {
           var triangle = new fabric.Triangle({
             width: 20, height: 30, fill: 'blue', left: 50, top: 50
           });
-          
           canvas.add(circle, triangle);
 
         let ll = new LinkedList();
