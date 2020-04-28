@@ -4,6 +4,7 @@
   "description": "A webapp for learning how to manipulate data structures with code.",
   "main": "index.ts",
   "scripts": {
+    "build": "webpack",
     "test": "test"
   },
   "repository": {
@@ -19,5 +20,16 @@
   "bugs": {
     "url": "https://github.com/SethPoulsen/data-structures-playground/issues"
   },
-  "homepage": "https://github.com/SethPoulsen/data-structures-playground#readme"
+  "homepage": "https://github.com/SethPoulsen/data-structures-playground#readme",
+  "dependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "fabric": "^3.6.3",
+    "source-map-loader": "^0.2.4"
+  },
+  "devDependencies": {
+    "@types/fabric": "^3.6.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
 }

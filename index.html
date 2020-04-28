@@ -3,10 +3,12 @@
     <link rel="icon" href="data:,">
 
     <head><title>Data Structures Playground</title></head>
-    <script src="./.build/index.js"></script>
+    <!-- <script src="./.build/index.js"></script> -->
+    <script src="./dist/bundle.js"></script>
+
     <script> 
         document.addEventListener('DOMContentLoaded', function() {
-            var dsp = new DSPlayground(document.getElementById("dsproot"));
+            var dsp = new DSPlayground.DSPlayground(document.getElementById("dsproot"));
         });
     </script>
     <body>
