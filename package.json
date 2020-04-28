@@ -1,0 +1,23 @@
+{
+  "name": "data-structures-playground",
+  "version": "0.0.1",
+  "description": "A webapp for learning how to manipulate data structures with code.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SethPoulsen/data-structures-playground.git"
+  },
+  "keywords": [
+    "data structures",
+    "visual programming languages"
+  ],
+  "author": "Seth Poulsen",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/SethPoulsen/data-structures-playground/issues"
+  },
+  "homepage": "https://github.com/SethPoulsen/data-structures-playground#readme"
+}
