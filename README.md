@@ -18,13 +18,16 @@ $ npm install
 and then compile the project with 
 
 ```sh
-$ webpack --depug
+$ webpack
 ```
+This webpack process will build once (should only take a few seconds), 
+then remain running to watch if you change files. When you change a file, 
+it will recompile very quickly. 
 
 Start a server in the root of the repository with 
 
 ```sh
-$ python -m http.server 8000
+$ python3 -m http.server 8000
 ```
 or your other favorite local server
 ([here](https://gist.github.com/willurd/5720255) are some other examples).
