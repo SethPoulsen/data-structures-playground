@@ -6,10 +6,21 @@ function setControlsBoxStyle(control: HTMLDivElement) {
     control.style.height = "200px"
     control.style.border = "1px solid black"; 
     control.style.padding = "10px";
-    // control.style.borderLeft = "2px solid black";
 }
 
+
 export class DSPlayground {
+
+    private controls: HTMLDivElement;
+
+    private createControlsDiv(html: string) {
+        let div = document.createElement("div");
+        setControlsBoxStyle(div);
+        div.innerHTML = html;
+        this.controls.appendChild(div);
+        return div;
+    }
+
     constructor(root: HTMLDivElement) {
         console.log("Made a new DSPlayground!");
         
@@ -20,21 +31,13 @@ export class DSPlayground {
         canvasEl.style.height = canvasEl.height + "px";
         root.append(canvasEl);
 
-        let controlsDiv = document.createElement("div");
-        root.append(controlsDiv);
-        controlsDiv.style.width = "1000px";
-        controlsDiv.style.height = "200px";
-        controlsDiv.style.display = "flex";
+        this.controls = document.createElement("div");
+        root.append(this.controls);
+        this.controls.style.width = "1000px";
+        this.controls.style.height = "200px";
+        this.controls.style.display = "flex";
 
-        let createNodeDiv = document.createElement("div");
-        let createPointerDiv = document.createElement("div"); 
-        let reassignPointerDiv = document.createElement("div");
-
-        setControlsBoxStyle(createNodeDiv);
-        setControlsBoxStyle(createPointerDiv);
-        setControlsBoxStyle(reassignPointerDiv);
-        
-        createNodeDiv.innerHTML = `
+        let createNodeDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" > 
                 <u> Create a new node </u>  
             </div> <div></div>
@@ -53,9 +56,9 @@ export class DSPlayground {
                     Create! 
                 </button>
             </div
-        `;
+        `);
 
-        createPointerDiv.innerHTML = `
+        let createPointerDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" > 
                 <u> Create a new Pointer </u>  
             </div> <div></div>
@@ -74,9 +77,9 @@ export class DSPlayground {
                     Create! 
                 </button>
             </div
-        `;
+        `);
 
-        reassignPointerDiv.innerHTML = `
+        let reassignPointerDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" > 
                 <u> Move/Reassign a pointer </u>  
             </div> <div></div>
@@ -95,12 +98,11 @@ export class DSPlayground {
                     Reassign! 
                 </button>
             </div
-        `;
-        controlsDiv.append(createNodeDiv);
-        controlsDiv.append(createPointerDiv);
-        controlsDiv.append(reassignPointerDiv);
+        `);
 
-        let ll = new LinkedList(canvasEl);
+        // TODO: create another controls box for the user to input a list of numbers 
+        // to initialize the list
+        let ll = new LinkedList(canvasEl, [7, 3, 8]);
 
     }
 }

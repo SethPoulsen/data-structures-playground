@@ -1,5 +1,5 @@
 module.exports = {
-    entry: "./src/index.ts",
+    entry: "./src/DSPlayground.ts",
     output: {
         filename: "./bundle.js",
         library: "DSPlayground"

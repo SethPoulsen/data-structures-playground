@@ -105,6 +105,3 @@ dist
 
 # VS Code stuff 
 .vscode
-
-# TSC build output
-.build
