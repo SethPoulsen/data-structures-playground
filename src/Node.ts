@@ -6,38 +6,50 @@ import Config = require("./Config");
 export class Node {
     public data: number;
     public next: Node;
+    
     public centerX: number;
     public centerY: number;
-    private representation: fabric.Object;
     
-    constructor(data: number, next: Node) {
+    private circleEl: SVGCircleElement;
+    private textEl: SVGTextElement;
+    
+    constructor(data: number, next: Node, svg: SVGElement) {
         this.data = data;
         this.next = next;
+
+        this.circleEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        this.textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+
+        let groupEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        groupEl.appendChild(this.circleEl);
+        groupEl.appendChild(this.textEl);
+
+        groupEl.addEventListener("mousedown", this.onDrag);
+
+        svg.appendChild(groupEl);
     }
     
-    public draw(svg: SVGElement): void {
+    private onDrag(): void {
+        console.log("HIII");
+    }
+
+    public draw(): void {
         // TODO: figures out how to use fabric.js to group the circle, 
         // number, and arrow together so that they all move together 
         // and can be treated as a single object to store in this.representation 
 
         // Draw the Node
-        let groupEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        
-        let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute("cx", this.centerX.toString());
-        circle.setAttribute("cy", this.centerY.toString());
-        circle.setAttribute("r", Config.NODE_SIZE.toString());
-        circle.setAttribute("stroke", "black")
-        circle.setAttribute("fill", "transparent")
+        this.circleEl.setAttribute("cx", this.centerX.toString());
+        this.circleEl.setAttribute("cy", this.centerY.toString());
+        this.circleEl.setAttribute("r", Config.NODE_SIZE.toString());
+        this.circleEl.setAttribute("stroke", "black")
+        this.circleEl.setAttribute("fill", "transparent")
 
-        let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute("x", this.centerX.toString());
-        text.setAttribute("y", this.centerY.toString());
-        text.innerHTML = this.data.toString();
-        text.setAttribute("style", "text-anchor: middle; dominant-baseline: middle;")
-
-        svg.appendChild(circle);
-        svg.appendChild(text);
+        this.textEl.setAttribute("x", this.centerX.toString());
+        this.textEl.setAttribute("y", this.centerY.toString());
+        this.textEl.innerHTML = this.data.toString();
+        this.textEl.setAttribute("style", "text-anchor: middle; dominant-baseline: middle;");
+        this.textEl.setAttribute("pointer-events", "none");
 
         // Draw the next pointer
         // TODO: write a utility function that will draw an arrow given start and end points

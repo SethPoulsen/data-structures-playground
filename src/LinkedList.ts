@@ -13,7 +13,7 @@ export class LinkedList {
 
         values = values.reverse();
         for (let num of values) {
-            this.head = new Node(num, this.head);
+            this.head = new Node(num, this.head, this.svgEl);
         }
 
         let leftEdge = Config.LIST_X;
@@ -55,7 +55,7 @@ export class LinkedList {
         let leftEdge = Config.LIST_X;
         let temp = this.head;
         while (temp) {
-            temp.draw(this.svgEl);
+            temp.draw();
             
             leftEdge += Config.NODE_SPACE;
             temp = temp.next;
