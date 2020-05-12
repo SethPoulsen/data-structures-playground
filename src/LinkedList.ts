@@ -16,6 +16,16 @@ export class LinkedList {
             this.head = new Node(num, this.head);
         }
 
+        let leftEdge = Config.LIST_X;
+        let temp = this.head;
+        while (temp) {
+            temp.centerX = leftEdge;
+            temp.centerY = Config.LIST_Y;
+            
+            leftEdge += Config.NODE_SPACE;
+            temp = temp.next;
+        }
+
         this.draw()
         
         // let nul = new fabric.IText('NULL', {
@@ -45,7 +55,7 @@ export class LinkedList {
         let leftEdge = Config.LIST_X;
         let temp = this.head;
         while (temp) {
-            temp.draw(this.svgEl, leftEdge);
+            temp.draw(this.svgEl);
             
             leftEdge += Config.NODE_SPACE;
             temp = temp.next;
