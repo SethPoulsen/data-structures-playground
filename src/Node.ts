@@ -13,26 +13,29 @@ export class Node {
         this.next = next;
     }
     
-    public draw(canvas: fabric.Canvas, leftEdge: number): void {
+    public draw(svg: SVGElement, leftEdge: number): void {
         // TODO: figures out how to use fabric.js to group the circle, 
         // number, and arrow together so that they all move together 
         // and can be treated as a single object to store in this.representation 
 
         // Draw the Node
-        var circle = new fabric.Circle({
-            radius: Config.NODE_SIZE, 
-            fill: '#00000000', 
-            left: leftEdge, 
-            top: Config.LIST_Y, 
-            stroke: 'black',
-            strokeWidth: 2
-        });
-        let num = new fabric.IText(this.data.toString(), {
-            left: leftEdge + 30,
-            top: Config.LIST_Y + 20,
-            fill: '#black',
-        });
-        canvas.add(circle, num);
+        let groupEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        
+        let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute("cx", leftEdge.toString());
+        circle.setAttribute("cy", Config.LIST_Y.toString());
+        circle.setAttribute("r", Config.NODE_SIZE.toString());
+        circle.setAttribute("stroke", "black")
+        circle.setAttribute("fill", "transparent")
+
+        let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute("x", leftEdge.toString());
+        text.setAttribute("y", Config.LIST_Y.toString());
+        text.innerHTML = this.data.toString();
+        text.setAttribute("style", "text-anchor: middle; dominant-baseline: middle;")
+
+        svg.appendChild(circle);
+        svg.appendChild(text);
 
         // Draw the next pointer
         // TODO: write a utility function that will draw an arrow given start and end points
@@ -41,9 +44,9 @@ export class Node {
         var line = makeLine([leftEdge + (2 * Config.NODE_SIZE), nodeCenter, nextNodeLeft, nodeCenter]);
         var arrow1 = makeLine([nextNodeLeft - 20, nodeCenter + 20, nextNodeLeft, nodeCenter]);
         let arrow2 = makeLine([nextNodeLeft - 20, nodeCenter - 20, nextNodeLeft, nodeCenter]);
-        canvas.add(line);
-        canvas.add(arrow1); 
-        canvas.add(arrow2);
+        svg.appendChild(line);
+        svg.appendChild(arrow1); 
+        svg.appendChild(arrow2);
 
     }
 

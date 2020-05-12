@@ -24,12 +24,10 @@ export class DSPlayground {
     constructor(root: HTMLDivElement) {
         console.log("Made a new DSPlayground!");
         
-        let canvasEl = document.createElement("canvas");
-        canvasEl.width = 1000;
-        canvasEl.height = 500;
-        canvasEl.style.width = canvasEl.width + "px";
-        canvasEl.style.height = canvasEl.height + "px";
-        root.append(canvasEl);
+        let svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svgEl.setAttribute('style', 'border: 1px solid black; width: 1000px; height: 500px;\
+                                     position: relative; display: block');
+        root.append(svgEl);
 
         this.controls = document.createElement("div");
         root.append(this.controls);
@@ -102,7 +100,7 @@ export class DSPlayground {
 
         // TODO: create another controls box for the user to input a list of numbers 
         // to initialize the list
-        let ll = new LinkedList(canvasEl, [7, 3, 8]);
+        let ll = new LinkedList(svgEl, [7, 3, 8]);
 
     }
 }
