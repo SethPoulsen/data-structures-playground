@@ -2,16 +2,17 @@ import { fabric } from "fabric";
 import { makeLine } from "./Utils";
 import { Node } from "./Node";
 import Config = require("./Config");
+import { Variable } from "./Variable";
 
 
 export class Pointer {
-    private origin: Node;
+    private origin: Node | Variable;
     public destination: Node;
 
     private line: fabric.Line;
     private arrowhead: fabric.Line[];
 
-    constructor(origin: Node, canvas: fabric.Canvas) {
+    constructor(origin: Node | Variable, canvas: fabric.Canvas) {
         this.origin = origin;
         this.destination = null;
 
@@ -23,7 +24,10 @@ export class Pointer {
     public draw(): void {
         if (this.destination === null) return;
 
-        const pointerAngle = this.origin.getAngle(this.destination);
+        const pointerAngle = Math.atan2(
+            this.destination.getCenter().y - this.origin.getCenter().y,
+            this.destination.getCenter().x - this.origin.getCenter().x,
+        );
 
         const { x: x1, y: y1 } = this.origin.getContactPoint(pointerAngle);
         const { x: x2, y: y2 } = this.destination.getContactPoint(pointerAngle + Math.PI);

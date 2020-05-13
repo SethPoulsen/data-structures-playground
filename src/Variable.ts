@@ -2,30 +2,24 @@ import { fabric } from "fabric";
 import { makeLine } from "./Utils";
 import { Pointer } from "./Pointer";
 import Config = require("./Config");
+import { Node } from "./Node";
 
-export class Node {
-    public data: number;
-    public next: Pointer;
+export class Variable {
+    public name: string;
+    public value: Pointer;
     private representation: fabric.Group;
 
-    constructor(data: number, canvas: fabric.Canvas) {
-        this.data = data;
-        this.next = new Pointer(this, canvas);
+    constructor(name: string, canvas: fabric.Canvas) {
+        this.name = name;
+        this.value = new Pointer(this, canvas);
 
-        const circle = new fabric.Circle({
-            radius: Config.NODE_SIZE,
-            fill: '#00000000',
-            stroke: 'black',
-            strokeWidth: 2,
-        });
-
-        const text = new fabric.IText(this.data.toString(), {
+        const text = new fabric.IText(this.name, {
             fill: '#black',
             evented: false,
             selectable: false
         });
 
-        this.representation = new fabric.Group([circle, text], {
+        this.representation = new fabric.Group([text], {
             hasControls: false,
             hasBorders: false,
             hoverCursor: "grab",
@@ -38,7 +32,7 @@ export class Node {
 
     public draw(): void {
         // Draw the pointer
-        this.next.draw();
+        this.value.draw();
     }
 
     /**

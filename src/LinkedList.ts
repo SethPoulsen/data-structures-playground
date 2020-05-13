@@ -2,9 +2,11 @@ import { fabric } from "fabric";
 import { Node } from "./Node";
 import { makeLine } from "./Utils";
 import Config = require("./Config");
+import { Variable } from "./Variable";
 
 export class LinkedList {
 
+    private globalVars: { [key: string]: Variable }
     private head: Node = null;
     private canvas: fabric.Canvas;
 
@@ -23,28 +25,12 @@ export class LinkedList {
             this.head.next.destination = temp;
         }
 
+        this.globalVars = {
+            head: new Variable("head", this.canvas),
+        }
+        this.globalVars.head.value.destination = this.head;
+
         this.draw()
-
-        let nul = new fabric.IText('NULL', {
-            left: Config.LIST_X + (values.length * Config.NODE_SPACE),
-            top: Config.LIST_Y + (Config.NODE_SIZE / 2),
-            fill: '#black',
-        });
-        this.canvas.add(nul)
-
-        let head = new fabric.IText('head', {
-            left: 20,
-            top: 20,
-            fill: '#black',
-        });
-        this.canvas.add(head)
-
-        let line = makeLine([60, 60, 100, 140]);
-        let arrow1 = makeLine([95, 110, 100, 140]);
-        let arrow2 = makeLine([70, 120, 100, 140]);
-        this.canvas.add(line);
-        this.canvas.add(arrow1);
-        this.canvas.add(arrow2);
 
         const self = this;
         this.canvas.on('object:moving', function (e) {
@@ -63,6 +49,7 @@ export class LinkedList {
             leftEdge += Config.NODE_SPACE;
             temp = temp.next.destination;
         }
+        this.globalVars.head.draw();
     }
 }
 
