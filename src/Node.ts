@@ -25,20 +25,27 @@ export class Node {
             left: leftEdge, 
             top: Config.LIST_Y, 
             stroke: 'black',
-            strokeWidth: 2
+            strokeWidth: 2,
+            hasControls: false,
+            hasBorders: false,
+            hoverCursor: "grab",
+            moveCursor: "grabbing",
         });
+
         let num = new fabric.IText(this.data.toString(), {
-            left: leftEdge + 30,
-            top: Config.LIST_Y + 20,
+            left: leftEdge,
+            top: Config.LIST_Y,
             fill: '#black',
+            evented: false,
+            selectable: false
         });
         canvas.add(circle, num);
 
         // Draw the next pointer
         // TODO: write a utility function that will draw an arrow given start and end points
-        const nodeCenter = Config.LIST_Y + Config.NODE_SIZE;
-        const nextNodeLeft = leftEdge + Config.NODE_SPACE
-        var line = makeLine([leftEdge + (2 * Config.NODE_SIZE), nodeCenter, nextNodeLeft, nodeCenter]);
+        const nodeCenter = Config.LIST_Y;
+        const nextNodeLeft = leftEdge + Config.NODE_SPACE - Config.NODE_SIZE;
+        var line = makeLine([leftEdge + Config.NODE_SIZE, nodeCenter, nextNodeLeft, nodeCenter]);
         var arrow1 = makeLine([nextNodeLeft - 20, nodeCenter + 20, nextNodeLeft, nodeCenter]);
         let arrow2 = makeLine([nextNodeLeft - 20, nodeCenter - 20, nextNodeLeft, nodeCenter]);
         canvas.add(line);

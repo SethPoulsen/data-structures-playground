@@ -11,6 +11,10 @@ export class LinkedList {
     constructor(canvasEl: HTMLCanvasElement, values:number[]=[]) {
 
         this.canvas = new fabric.Canvas(canvasEl);
+        this.canvas.selection = false;
+        
+        // this allows us to draw circles using the coordinates of their centers
+        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
 
         values = values.reverse();
         for (let num of values) {
