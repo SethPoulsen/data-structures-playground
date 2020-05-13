@@ -18,7 +18,9 @@ export class LinkedList {
 
         values = values.reverse();
         for (let num of values) {
-            this.head = new Node(num, this.head);
+            const temp = this.head;
+            this.head = new Node(num, this.canvas);
+            this.head.next.destination = temp;
         }
 
         this.draw()
@@ -46,11 +48,7 @@ export class LinkedList {
 
         const self = this;
         this.canvas.on('object:moving', function (e) {
-            let temp = self.head;
-            while (temp) {
-                temp.redraw();
-                temp = temp.next.destination;
-            }
+            self.draw();
             self.canvas.renderAll();
         });
 
@@ -60,7 +58,7 @@ export class LinkedList {
         let leftEdge = Config.LIST_X;
         let temp = this.head;
         while (temp) {
-            temp.draw(this.canvas, leftEdge);
+            temp.draw();
 
             leftEdge += Config.NODE_SPACE;
             temp = temp.next.destination;

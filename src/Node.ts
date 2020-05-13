@@ -8,17 +8,10 @@ export class Node {
     public next: Pointer;
     private representation: fabric.Group;
 
-    constructor(data: number, next: Node) {
+    constructor(data: number, canvas: fabric.Canvas) {
         this.data = data;
-        this.next = new Pointer(this, next);
-    }
+        this.next = new Pointer(this, canvas);
 
-    public draw(canvas: fabric.Canvas, leftEdge: number): void {
-        // TODO: figures out how to use fabric.js to group the circle, 
-        // number, and arrow together so that they all move together 
-        // and can be treated as a single object to store in this.representation 
-
-        // Draw the Node
         const circle = new fabric.Circle({
             radius: Config.NODE_SIZE,
             fill: '#00000000',
@@ -33,8 +26,6 @@ export class Node {
         });
 
         this.representation = new fabric.Group([circle, text], {
-            left: leftEdge,
-            top: Config.LIST_Y,
             hasControls: false,
             hasBorders: false,
             hoverCursor: "grab",
@@ -42,15 +33,12 @@ export class Node {
         });
 
         canvas.add(this.representation);
-        this.next.draw(canvas, leftEdge)
+        this.representation.center();
     }
 
-    public redraw(): void {
-        // this.canvasObjects.text.set({
-        //     left: this.canvasObjects.circle.left,
-        //     top: this.canvasObjects.circle.top,
-        // });
-        this.next.redraw();
+    public draw(): void {
+        // Draw the pointer
+        this.next.draw();
     }
 
     /**
@@ -71,6 +59,4 @@ export class Node {
         return Math.atan2(other.representation.top - this.representation.top,
             other.representation.left - this.representation.left);
     }
-}
-
 }

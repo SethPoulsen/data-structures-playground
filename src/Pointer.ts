@@ -5,33 +5,22 @@ import Config = require("./Config");
 
 
 export class Pointer {
-    public origin: Node;
+    private origin: Node;
     public destination: Node;
 
     private line: fabric.Line;
     private arrowhead: fabric.Line[];
 
-    constructor(origin: Node, destination: Node) {
+    constructor(origin: Node, canvas: fabric.Canvas) {
         this.origin = origin;
-        this.destination = destination;
+        this.destination = null;
+
+        this.line = makeLine();
+        this.arrowhead = [makeLine(), makeLine()];
+        canvas.add(this.line, ...this.arrowhead);
     }
 
-    public draw(canvas: fabric.Canvas, leftEdge: number): void {
-        // Draw the next pointer
-        // TODO: write a utility function that will draw an arrow given start and end points
-        const nodeCenter = Config.LIST_Y;
-        const nextNodeLeft = leftEdge + Config.NODE_SPACE - Config.NODE_SIZE;
-        this.line = makeLine([leftEdge + Config.NODE_SIZE, nodeCenter, nextNodeLeft, nodeCenter]);
-        this.arrowhead = [
-            makeLine([nextNodeLeft - 20, nodeCenter + 20, nextNodeLeft, nodeCenter]),
-            makeLine([nextNodeLeft - 20, nodeCenter - 20, nextNodeLeft, nodeCenter]),
-        ]
-
-        canvas.add(this.line);
-        canvas.add(...this.arrowhead);
-    }
-
-    public redraw(): void {
+    public draw(): void {
         if (this.destination === null) return;
 
         const pointerAngle = this.origin.getAngle(this.destination);
