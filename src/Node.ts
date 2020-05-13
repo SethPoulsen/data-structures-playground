@@ -1,16 +1,16 @@
 import { fabric } from "fabric";
 import { makeLine } from "./Utils";
+import { Pointer } from "./Pointer";
 import Config = require("./Config");
-
 
 export class Node {
     public data: number;
-    public next: Node;
+    public next: Pointer;
     private representation: fabric.Group;
 
     constructor(data: number, next: Node) {
         this.data = data;
-        this.next = next;
+        this.next = new Pointer(this, next);
     }
 
     public draw(canvas: fabric.Canvas, leftEdge: number): void {
@@ -42,17 +42,7 @@ export class Node {
         });
 
         canvas.add(this.representation);
-
-        // Draw the next pointer
-        // TODO: write a utility function that will draw an arrow given start and end points
-        const nodeCenter = Config.LIST_Y;
-        const nextNodeLeft = leftEdge + Config.NODE_SPACE - Config.NODE_SIZE;
-        var line = makeLine([leftEdge + Config.NODE_SIZE, nodeCenter, nextNodeLeft, nodeCenter]);
-        var arrow1 = makeLine([nextNodeLeft - 20, nodeCenter + 20, nextNodeLeft, nodeCenter]);
-        let arrow2 = makeLine([nextNodeLeft - 20, nodeCenter - 20, nextNodeLeft, nodeCenter]);
-        canvas.add(line);
-        canvas.add(arrow1);
-        canvas.add(arrow2);
+        this.next.draw(canvas, leftEdge)
     }
 
     public redraw(): void {
@@ -60,6 +50,27 @@ export class Node {
         //     left: this.canvasObjects.circle.left,
         //     top: this.canvasObjects.circle.top,
         // });
+        this.next.redraw();
     }
+
+    /**
+     * Return the location where the pointer touches this node.
+     * @param angle the angle at which the pointer will be drawn, in radians.
+     */
+    public getContactPoint(angle: number) {
+        return {
+            x: this.representation.left + Math.cos(angle) * Config.NODE_SIZE,
+            y: this.representation.top + Math.sin(angle) * Config.NODE_SIZE,
+        }
+    }
+
+    /**
+     * Returns the angle of a line from this Node to another Node, in radians.
+     */
+    public getAngle(other: Node) {
+        return Math.atan2(other.representation.top - this.representation.top,
+            other.representation.left - this.representation.left);
+    }
+}
 
 }

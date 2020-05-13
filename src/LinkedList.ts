@@ -49,8 +49,9 @@ export class LinkedList {
             let temp = self.head;
             while (temp) {
                 temp.redraw();
-                temp = temp.next;
+                temp = temp.next.destination;
             }
+            self.canvas.renderAll();
         });
 
     }
@@ -62,7 +63,7 @@ export class LinkedList {
             temp.draw(this.canvas, leftEdge);
 
             leftEdge += Config.NODE_SPACE;
-            temp = temp.next;
+            temp = temp.next.destination;
         }
     }
 }
