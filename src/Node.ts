@@ -6,12 +6,7 @@ import Config = require("./Config");
 export class Node {
     public data: number;
     public next: Node;
-    private representation: fabric.Object;
-
-    private canvasObjects: {
-        circle: fabric.Circle;
-        text: fabric.Text;
-    };
+    private representation: fabric.Group;
 
     constructor(data: number, next: Node) {
         this.data = data;
@@ -24,30 +19,29 @@ export class Node {
         // and can be treated as a single object to store in this.representation 
 
         // Draw the Node
-        this.canvasObjects = {
-            circle: new fabric.Circle({
-                radius: Config.NODE_SIZE,
-                fill: '#00000000',
-                left: leftEdge,
-                top: Config.LIST_Y,
-                stroke: 'black',
-                strokeWidth: 2,
-                hasControls: false,
-                hasBorders: false,
-                hoverCursor: "grab",
-                moveCursor: "grabbing",
-            }),
+        const circle = new fabric.Circle({
+            radius: Config.NODE_SIZE,
+            fill: '#00000000',
+            stroke: 'black',
+            strokeWidth: 2,
+        });
 
-            text: new fabric.IText(this.data.toString(), {
-                left: leftEdge,
-                top: Config.LIST_Y,
-                fill: '#black',
-                evented: false,
-                selectable: false
-            })
-        };
+        const text = new fabric.IText(this.data.toString(), {
+            fill: '#black',
+            evented: false,
+            selectable: false
+        });
 
-        canvas.add(this.canvasObjects.circle, this.canvasObjects.text);
+        this.representation = new fabric.Group([circle, text], {
+            left: leftEdge,
+            top: Config.LIST_Y,
+            hasControls: false,
+            hasBorders: false,
+            hoverCursor: "grab",
+            moveCursor: "grabbing",
+        });
+
+        canvas.add(this.representation);
 
         // Draw the next pointer
         // TODO: write a utility function that will draw an arrow given start and end points
@@ -62,10 +56,10 @@ export class Node {
     }
 
     public redraw(): void {
-        this.canvasObjects.text.set({
-            left: this.canvasObjects.circle.left,
-            top: this.canvasObjects.circle.top,
-        });
+        // this.canvasObjects.text.set({
+        //     left: this.canvasObjects.circle.left,
+        //     top: this.canvasObjects.circle.top,
+        // });
     }
 
 }
