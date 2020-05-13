@@ -6,8 +6,8 @@ import { Variable } from "./Variable";
 
 export class LinkedList {
 
-    private globalVars: { [key: string]: Variable }
-    private head: Node = null;
+    private globalVars: { [key: string]: Variable };
+    private nodes: Node[];
     private canvas: fabric.Canvas;
 
     constructor(canvasEl: HTMLCanvasElement, values: number[] = []) {
@@ -18,38 +18,37 @@ export class LinkedList {
         // this allows us to draw circles using the coordinates of their centers
         fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
 
-        values = values.reverse();
+        this.nodes = [];
         for (let num of values) {
-            const temp = this.head;
-            this.head = new Node(num, this.canvas);
-            this.head.next.destination = temp;
+            this.nodes.push(new Node(num, this.canvas));
+        }
+
+        for (let i = 0; i < this.nodes.length - 1; ++i) {
+            this.nodes[i].next.destination = this.nodes[i + 1];
         }
 
         this.globalVars = {
             head: new Variable("head", this.canvas),
         }
-        this.globalVars.head.value.destination = this.head;
+        this.globalVars.head.value.destination = this.nodes[0];
 
-        this.draw()
+        this.draw();
 
         const self = this;
         this.canvas.on('object:moving', function (e) {
             self.draw();
             self.canvas.renderAll();
         });
-
     }
 
     public draw() {
-        let leftEdge = Config.LIST_X;
-        let temp = this.head;
-        while (temp) {
-            temp.draw();
-
-            leftEdge += Config.NODE_SPACE;
-            temp = temp.next.destination;
+        for (let key in this.globalVars) {
+            this.globalVars[key].draw();
         }
-        this.globalVars.head.draw();
+
+        for (let node of this.nodes) {
+            node.draw();
+        }
     }
 }
 
