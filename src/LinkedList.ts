@@ -2,56 +2,52 @@ import { fabric } from "fabric";
 import { Node } from "./Node";
 import { makeLine } from "./Utils";
 import Config = require("./Config");
+import { Variable } from "./Variable";
 
 export class LinkedList {
 
-    private head: Node = null;
+    private globalVars: { [key: string]: Variable };
+    private nodes: Node[];
     private canvas: fabric.Canvas;
 
-    constructor(canvasEl: HTMLCanvasElement, values:number[]=[]) {
+    constructor(canvasEl: HTMLCanvasElement, values: number[] = []) {
 
         this.canvas = new fabric.Canvas(canvasEl);
+        this.canvas.selection = false;
 
-        values = values.reverse();
+        // this allows us to draw circles using the coordinates of their centers
+        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+
+        this.nodes = [];
         for (let num of values) {
-            this.head = new Node(num, this.head);
+            this.nodes.push(new Node(num, this.canvas));
         }
 
-        this.draw()
-        
-        let nul = new fabric.IText('NULL', {
-            left: Config.LIST_X + (values.length * Config.NODE_SPACE),
-            top: Config.LIST_Y + (Config.NODE_SIZE / 2),
-            fill: '#black',
-        });
-        this.canvas.add(nul) 
+        for (let i = 0; i < this.nodes.length - 1; ++i) {
+            this.nodes[i].next.set(this.nodes[i + 1]);
+        }
 
-        let head = new fabric.IText('head', {
-            left: 20,
-            top: 20,
-            fill: '#black',
-        });
-        this.canvas.add(head) 
+        this.globalVars = {
+            head: new Variable("head", this.canvas),
+        }
+        this.globalVars.head.set(this.nodes[0]);
 
-        let line = makeLine([60, 60, 100, 140]);
-        let arrow1 = makeLine([95, 110, 100, 140]);
-        let arrow2 = makeLine([70, 120, 100, 140]);
-        this.canvas.add(line);
-        this.canvas.add(arrow1); 
-        this.canvas.add(arrow2);
-    
+        this.draw();
+
+        const self = this;
+        this.canvas.on('object:moving', function (e) {
+            self.draw();
+            self.canvas.renderAll();
+        });
     }
 
     public draw() {
-        let leftEdge = Config.LIST_X;
-        let temp = this.head;
-        while (temp) {
-            temp.draw(this.canvas, leftEdge);
-            
-            leftEdge += Config.NODE_SPACE;
-            temp = temp.next;
+        for (let key in this.globalVars) {
+            this.globalVars[key].draw();
+        }
+
+        for (let node of this.nodes) {
+            node.draw();
         }
     }
 }
-
-

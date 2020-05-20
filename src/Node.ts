@@ -1,50 +1,60 @@
 import { fabric } from "fabric";
 import { makeLine } from "./Utils";
+import { Pointer } from "./Pointer";
 import Config = require("./Config");
-
 
 export class Node {
     public data: number;
-    public next: Node;
-    private representation: fabric.Object;
-    
-    constructor(data: number, next: Node) {
+    public next: Pointer;
+    private representation: fabric.Group;
+
+    constructor(data: number, canvas: fabric.Canvas) {
         this.data = data;
-        this.next = next;
-    }
-    
-    public draw(canvas: fabric.Canvas, leftEdge: number): void {
-        // TODO: figures out how to use fabric.js to group the circle, 
-        // number, and arrow together so that they all move together 
-        // and can be treated as a single object to store in this.representation 
+        this.next = new Pointer(this, canvas);
 
-        // Draw the Node
-        var circle = new fabric.Circle({
-            radius: Config.NODE_SIZE, 
-            fill: '#00000000', 
-            left: leftEdge, 
-            top: Config.LIST_Y, 
+        const circle = new fabric.Circle({
+            radius: Config.NODE_SIZE,
+            fill: '#00000000',
             stroke: 'black',
-            strokeWidth: 2
+            strokeWidth: 2,
         });
-        let num = new fabric.IText(this.data.toString(), {
-            left: leftEdge + 30,
-            top: Config.LIST_Y + 20,
+
+        const text = new fabric.IText(this.data.toString(), {
             fill: '#black',
+            evented: false,
+            selectable: false
         });
-        canvas.add(circle, num);
 
-        // Draw the next pointer
-        // TODO: write a utility function that will draw an arrow given start and end points
-        const nodeCenter = Config.LIST_Y + Config.NODE_SIZE;
-        const nextNodeLeft = leftEdge + Config.NODE_SPACE
-        var line = makeLine([leftEdge + (2 * Config.NODE_SIZE), nodeCenter, nextNodeLeft, nodeCenter]);
-        var arrow1 = makeLine([nextNodeLeft - 20, nodeCenter + 20, nextNodeLeft, nodeCenter]);
-        let arrow2 = makeLine([nextNodeLeft - 20, nodeCenter - 20, nextNodeLeft, nodeCenter]);
-        canvas.add(line);
-        canvas.add(arrow1); 
-        canvas.add(arrow2);
+        this.representation = new fabric.Group([circle, text], {
+            hasControls: false,
+            hasBorders: false,
+            hoverCursor: "grab",
+            moveCursor: "grabbing",
+        });
 
+        canvas.add(this.representation);
+        this.representation.center();
     }
 
+    public draw(): void {
+        this.next.draw();
+    }
+
+    /**
+     * Return the location where the pointer touches this node.
+     * @param angle the angle at which the pointer will be drawn, in radians.
+     */
+    public getContactPoint(angle: number) {
+        return {
+            x: this.representation.left + Math.cos(angle) * Config.NODE_SIZE,
+            y: this.representation.top + Math.sin(angle) * Config.NODE_SIZE,
+        }
+    }
+
+    public getCenter() {
+        return {
+            x: this.representation.left,
+            y: this.representation.top,
+        }
+    }
 }
