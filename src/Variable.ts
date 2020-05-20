@@ -6,12 +6,12 @@ import { Node } from "./Node";
 
 export class Variable {
     private name: string;
-    private value: Pointer;
+    public pointer: Pointer;
     private representation: fabric.Group;
 
     constructor(name: string, canvas: fabric.Canvas) {
         this.name = name;
-        this.value = new Pointer(this, canvas);
+        this.pointer = new Pointer(this, canvas);
 
         const text = new fabric.IText(this.name, {
             fill: '#black',
@@ -30,16 +30,19 @@ export class Variable {
         this.representation.center();
     }
 
-    public set(nodePointedTo: Node) {
-        this.value.set(nodePointedTo);
-    }
+    public getAccessibleNames() {
+        let nodePointedTo = this.pointer.get();
 
-    public getCurrValue() {
-        return this.value.get();
+        let pointers = [this.name];
+        if (nodePointedTo !== null) {
+            pointers = pointers.concat(
+                Object.keys(nodePointedTo.pointers).map(pointerName => this.name + "->" + pointerName));
+        }
+        return pointers;
     }
 
     public draw(): void {
-        this.value.draw();
+        this.pointer.draw();
     }
 
     /**

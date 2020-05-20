@@ -128,7 +128,7 @@ export class DSPlayground {
 
     updateDropdownOptions(ll: LinkedList) {
         let options = "";
-        for (let varName of ll.getAccessibleVars()) {
+        for (let varName of ll.getAccessibleNames()) {
             options += `<option>${varName}</option>`;
         }
         this.controls.querySelectorAll("select").forEach(selectEl => selectEl.innerHTML = options);

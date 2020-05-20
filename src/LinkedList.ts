@@ -41,8 +41,13 @@ export class LinkedList {
         this.canvas.renderAll();
     }
 
-    public getAccessibleVars() {
-        return Object.keys(this.globalVars);
+    public getAccessibleNames() {
+        let names : string[] = [];
+
+        for (let key in this.globalVars) {
+            names = names.concat(this.globalVars[key].getAccessibleNames())
+        }
+        return names;
     }
 
     public createPointer(name: string) {
@@ -51,21 +56,24 @@ export class LinkedList {
     }
 
     public createNode(value: number, pointerToNode: string) {
-        if (!(pointerToNode in this.globalVars)) {
-            throw Error("Invalid pointer to node");
-        }
-
         const node = new Node(value, this.canvas);
         this.nodes.push(node);
-        this.globalVars[pointerToNode].set(node);
+        this.getPointerFromString(pointerToNode).set(node);
 
         this.draw();
     }
 
     public reassignPointer(lhs: string, rhs: string) {
-        console.log("HO");
-        this.globalVars[lhs].set(this.globalVars[rhs].getCurrValue());
-
+        this.getPointerFromString(lhs).set(this.getPointerFromString(rhs).get());
         this.draw();
+    }
+
+    private getPointerFromString(str: string) {
+        let [firstToken, ...remainingTokens] = str.split("->");
+        if (!(firstToken in this.globalVars)) {
+            throw Error("Invalid string; first token is not a global variable");
+        }
+
+        return this.globalVars[firstToken].pointer.getPointer(remainingTokens);
     }
 }
