@@ -5,8 +5,8 @@ import Config = require("./Config");
 import { Node } from "./Node";
 
 export class Variable {
-    public name: string;
-    public value: Pointer;
+    private name: string;
+    private value: Pointer;
     private representation: fabric.Group;
 
     constructor(name: string, canvas: fabric.Canvas) {
@@ -28,6 +28,10 @@ export class Variable {
 
         canvas.add(this.representation);
         this.representation.center();
+    }
+
+    public set(nodePointedTo: Node) {
+        this.value.set(nodePointedTo);
     }
 
     public draw(): void {

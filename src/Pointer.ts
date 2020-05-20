@@ -7,7 +7,7 @@ import { Variable } from "./Variable";
 
 export class Pointer {
     private origin: Node | Variable;
-    public destination: Node;
+    private destination: Node;
 
     private line: fabric.Line;
     private arrowhead: fabric.Line[];
@@ -19,6 +19,10 @@ export class Pointer {
         this.line = makeLine();
         this.arrowhead = [makeLine(), makeLine()];
         canvas.add(this.line, ...this.arrowhead);
+    }
+
+    public set(nodePointedTo: Node) {
+        this.destination = nodePointedTo;
     }
 
     public draw(): void {

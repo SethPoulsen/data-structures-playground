@@ -24,13 +24,13 @@ export class LinkedList {
         }
 
         for (let i = 0; i < this.nodes.length - 1; ++i) {
-            this.nodes[i].next.destination = this.nodes[i + 1];
+            this.nodes[i].next.set(this.nodes[i + 1]);
         }
 
         this.globalVars = {
             head: new Variable("head", this.canvas),
         }
-        this.globalVars.head.value.destination = this.nodes[0];
+        this.globalVars.head.set(this.nodes[0]);
 
         this.draw();
 
@@ -51,5 +51,3 @@ export class LinkedList {
         }
     }
 }
-
-
