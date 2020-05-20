@@ -34,6 +34,10 @@ export class Variable {
         this.value.set(nodePointedTo);
     }
 
+    public getCurrValue() {
+        return this.value.get();
+    }
+
     public draw(): void {
         this.value.draw();
     }

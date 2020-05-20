@@ -24,6 +24,10 @@ export class Pointer {
         this.destination = nodePointedTo;
     }
 
+    public get() {
+        return this.destination;
+    }
+
     public draw(): void {
         if (this.destination === null) return;
 
