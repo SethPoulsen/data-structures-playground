@@ -37,7 +37,6 @@ export class Node {
     }
 
     public draw(): void {
-        // Draw the pointer
         this.next.draw();
     }
 
@@ -52,9 +51,6 @@ export class Node {
         }
     }
 
-    /**
-     * Returns the angle of a line from this Node to another Node, in radians.
-     */
     public getCenter() {
         return {
             x: this.representation.left,

@@ -35,12 +35,11 @@ export class Variable {
     }
 
     public draw(): void {
-        // Draw the pointer
         this.value.draw();
     }
 
     /**
-     * Return the location where the pointer touches this node.
+     * Return the location where the pointer touches this variable on the canvas.
      * @param angle the angle at which the pointer will be drawn, in radians.
      */
     public getContactPoint(angle: number) {
@@ -57,9 +56,6 @@ export class Variable {
         }
     }
 
-    /**
-     * Returns the angle of a line from this Node to another Node, in radians.
-     */
     public getCenter() {
         return {
             x: this.representation.left,

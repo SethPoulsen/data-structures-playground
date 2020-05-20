@@ -4,7 +4,6 @@ import { Node } from "./Node";
 import Config = require("./Config");
 import { Variable } from "./Variable";
 
-
 export class Pointer {
     private origin: Node | Variable;
     private destination: Node;
