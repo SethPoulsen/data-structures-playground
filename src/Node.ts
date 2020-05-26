@@ -5,12 +5,16 @@ import Config = require("./Config");
 
 export class Node {
     public data: number;
-    public next: Pointer;
+    public pointers: {
+        [key: string]: Pointer
+    };
     private representation: fabric.Group;
 
     constructor(data: number, canvas: fabric.Canvas) {
         this.data = data;
-        this.next = new Pointer(this, canvas);
+        this.pointers = {
+            next: new Pointer(this, canvas)
+        };
 
         const circle = new fabric.Circle({
             radius: Config.NODE_SIZE,
@@ -37,7 +41,9 @@ export class Node {
     }
 
     public draw(): void {
-        this.next.draw();
+        for (let key in this.pointers) {
+            this.pointers[key].draw();
+        }
     }
 
     /**

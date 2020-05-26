@@ -20,8 +20,25 @@ export class Pointer {
         canvas.add(this.line, ...this.arrowhead);
     }
 
+    public getPointer(tokens: string[]) : Pointer {
+        if (tokens.length === 0) {
+            return this;
+        }
+
+        let [firstToken, ...remainingTokens] = tokens;
+        if (!(firstToken in this.destination.pointers)) {
+            throw Error("Invalid string; first token is not a global variable");
+        }
+
+        return this.destination.pointers[firstToken].getPointer(remainingTokens);
+    }
+
     public set(nodePointedTo: Node) {
         this.destination = nodePointedTo;
+    }
+
+    public get() {
+        return this.destination;
     }
 
     public draw(): void {
