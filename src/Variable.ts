@@ -30,13 +30,10 @@ export class Variable {
         this.representation.center();
     }
 
-    public getAccessibleNames() {
-        let nodePointedTo = this.pointer.get();
-
+    public getAccessibleNames(): string[] {
         let pointers = [this.name];
-        if (nodePointedTo !== null) {
-            pointers = pointers.concat(
-                Object.keys(nodePointedTo.pointers).map(pointerName => this.name + "->" + pointerName));
+        if (this.pointer.deref() !== null) {
+            pointers.push(this.name + "->next");
         }
         return pointers;
     }

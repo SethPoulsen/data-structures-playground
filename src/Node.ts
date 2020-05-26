@@ -1,20 +1,15 @@
 import { fabric } from "fabric";
-import { makeLine } from "./Utils";
 import { Pointer } from "./Pointer";
 import Config = require("./Config");
 
 export class Node {
     public data: number;
-    public pointers: {
-        [key: string]: Pointer
-    };
+    public next: Pointer
     private representation: fabric.Group;
 
     constructor(data: number, canvas: fabric.Canvas) {
         this.data = data;
-        this.pointers = {
-            next: new Pointer(this, canvas)
-        };
+        this.next = new Pointer(this, canvas);
 
         const circle = new fabric.Circle({
             radius: Config.NODE_SIZE,
@@ -41,9 +36,7 @@ export class Node {
     }
 
     public draw(): void {
-        for (let key in this.pointers) {
-            this.pointers[key].draw();
-        }
+        this.next.draw()
     }
 
     /**
