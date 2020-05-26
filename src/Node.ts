@@ -1,5 +1,6 @@
 import { fabric } from "fabric";
 import { Pointer } from "./Pointer";
+import { Point } from "./Types";
 import Config = require("./Config");
 
 export class Node {
@@ -36,24 +37,24 @@ export class Node {
     }
 
     public draw(): void {
-        this.next.draw()
+        this.next.draw();
     }
 
     /**
      * Return the location where the pointer touches this node.
      * @param angle the angle at which the pointer will be drawn, in radians.
      */
-    public getContactPoint(angle: number) {
+    public getContactPoint(angle: number): Point {
         return {
             x: this.representation.left + Math.cos(angle) * Config.NODE_SIZE,
             y: this.representation.top + Math.sin(angle) * Config.NODE_SIZE,
-        }
+        };
     }
 
-    public getCenter() {
+    public getCenter(): Point {
         return {
             x: this.representation.left,
             y: this.representation.top,
-        }
+        };
     }
 }

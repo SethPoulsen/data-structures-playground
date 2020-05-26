@@ -22,18 +22,15 @@ export class LinkedList {
 
         this.draw();
 
-        const self = this;
-        this.canvas.on('object:moving', function (e) {
-            self.draw();
-        });
+        this.canvas.on('object:moving', () => this.draw());
     }
 
-    public draw() {
-        for (let key in this.globalVars) {
+    public draw(): void {
+        for (const key in this.globalVars) {
             this.globalVars[key].draw();
         }
 
-        for (let node of this.nodes) {
+        for (const node of this.nodes) {
             node.draw();
         }
 
@@ -42,8 +39,8 @@ export class LinkedList {
 
     public getAccessibleNames(): string[] {
         let names : string[] = [];
-        for (let key in this.globalVars) {
-            names = names.concat(this.globalVars[key].getAccessibleNames())
+        for (const key in this.globalVars) {
+            names = names.concat(this.globalVars[key].getAccessibleNames());
         }
         return names;
     }
@@ -67,7 +64,7 @@ export class LinkedList {
     }
 
     private getPointerFromString(str: string): Pointer {
-        let [firstToken, next] = str.split("->");
+        const [firstToken, next] = str.split("->");
         if (!(firstToken in this.globalVars)) {
             throw Error("Invalid string; first token is not a global variable");
         } else if (next === undefined) {
@@ -75,7 +72,7 @@ export class LinkedList {
         } else if (next === "next") {
             return this.globalVars[firstToken].pointer.deref().next;
         } else {
-            throw Error("Only member pointers names 'next' are supported right now.")
+            throw Error("Only member pointers names 'next' are supported right now.");
         }
     }
 }

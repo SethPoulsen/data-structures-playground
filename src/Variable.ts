@@ -1,8 +1,6 @@
 import { fabric } from "fabric";
-import { makeLine } from "./Utils";
 import { Pointer } from "./Pointer";
-import Config = require("./Config");
-import { Node } from "./Node";
+import { Point } from "./Types";
 
 export class Variable {
     private name: string;
@@ -31,7 +29,7 @@ export class Variable {
     }
 
     public getAccessibleNames(): string[] {
-        let pointers = [this.name];
+        const pointers = [this.name];
         if (this.pointer.deref() !== null) {
             pointers.push(this.name + "->next");
         }
@@ -46,7 +44,7 @@ export class Variable {
      * Return the location where the pointer touches this variable on the canvas.
      * @param angle the angle at which the pointer will be drawn, in radians.
      */
-    public getContactPoint(angle: number) {
+    public getContactPoint(angle: number): Point {
         // r is distance from center to contact point
         // take minimum to determine if it intersects the vertical or horizontal boundary first
         const r = Math.min(
@@ -57,13 +55,13 @@ export class Variable {
         return {
             x: this.representation.left + Math.cos(angle) * r,
             y: this.representation.top + Math.sin(angle) * r
-        }
+        };
     }
 
-    public getCenter() {
+    public getCenter(): Point {
         return {
             x: this.representation.left,
             y: this.representation.top,
-        }
+        };
     }
 }

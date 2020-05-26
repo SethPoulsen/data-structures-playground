@@ -14,7 +14,7 @@ export class DSPlayground {
     private controls: HTMLDivElement;
 
     private createControlsDiv(html: string) {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         setControlsBoxStyle(div);
         div.innerHTML = html;
         this.controls.appendChild(div);
@@ -24,7 +24,7 @@ export class DSPlayground {
     constructor(root: HTMLDivElement) {
         console.log("Made a new DSPlayground!");
 
-        let canvasEl = document.createElement("canvas");
+        const canvasEl = document.createElement("canvas");
         canvasEl.width = 1000;
         canvasEl.height = 500;
         canvasEl.style.width = canvasEl.width + "px";
@@ -37,7 +37,7 @@ export class DSPlayground {
         this.controls.style.height = "200px";
         this.controls.style.display = "flex";
 
-        let createNodeDiv = this.createControlsDiv(`
+        const createNodeDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" >
                 <u> Create a new node </u>
             </div> <div></div>
@@ -58,7 +58,7 @@ export class DSPlayground {
             </div
         `);
 
-        let createPointerDiv = this.createControlsDiv(`
+        const createPointerDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" >
                 <u> Create a new Pointer </u>
             </div> <div></div>
@@ -75,7 +75,7 @@ export class DSPlayground {
             </div
         `);
 
-        let reassignPointerDiv = this.createControlsDiv(`
+        const reassignPointerDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" >
                 <u> Move/Reassign a pointer </u>
             </div> <div></div>
@@ -98,37 +98,37 @@ export class DSPlayground {
 
         // TODO: create another controls box for the user to input a list of numbers
         // to initialize the list
-        let ll = new LinkedList(canvasEl);
+        const ll = new LinkedList(canvasEl);
 
         createPointerDiv.querySelector("button").addEventListener("click", () => {
-            let inputEl = createPointerDiv.querySelector("input");
+            const inputEl = createPointerDiv.querySelector("input");
             ll.createPointer(inputEl.value);
             inputEl.value = "";
             this.updateDropdownOptions(ll);
         });
 
         createNodeDiv.querySelector("button").addEventListener("click", () => {
-            let inputEl = createNodeDiv.querySelector("input");
-            let selectEl = createNodeDiv.querySelector("select");
-            let pointerName = selectEl.selectedOptions[0].value;
+            const inputEl = createNodeDiv.querySelector("input");
+            const selectEl = createNodeDiv.querySelector("select");
+            const pointerName = selectEl.selectedOptions[0].value;
             ll.createNode(parseInt(inputEl.value), pointerName);
             inputEl.value = "";
             this.updateDropdownOptions(ll);
         });
 
         reassignPointerDiv.querySelector("button").addEventListener("click", () => {
-            let selectEls = reassignPointerDiv.querySelectorAll("select");
+            const selectEls = reassignPointerDiv.querySelectorAll("select");
 
-            let lhsPointer = selectEls[0].selectedOptions[0].value;
-            let rhsPointer = selectEls[1].selectedOptions[0].value;
+            const lhsPointer = selectEls[0].selectedOptions[0].value;
+            const rhsPointer = selectEls[1].selectedOptions[0].value;
             ll.reassignPointer(lhsPointer, rhsPointer);
             this.updateDropdownOptions(ll);
         });
     }
 
-    updateDropdownOptions(ll: LinkedList) {
+    private updateDropdownOptions(ll: LinkedList): void {
         let options = "";
-        for (let varName of ll.getAccessibleNames()) {
+        for (const varName of ll.getAccessibleNames()) {
             options += `<option>${varName}</option>`;
         }
         this.controls.querySelectorAll("select").forEach(selectEl => selectEl.innerHTML = options);

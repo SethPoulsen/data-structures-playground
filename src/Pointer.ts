@@ -1,7 +1,6 @@
 import { fabric } from "fabric";
 import { makeLine } from "./Utils";
 import { Node } from "./Node";
-import Config = require("./Config");
 import { Variable } from "./Variable";
 
 export class Pointer {
@@ -20,11 +19,11 @@ export class Pointer {
         canvas.add(this.line, ...this.arrowhead);
     }
 
-    public set(nodePointedTo: Node) {
+    public set(nodePointedTo: Node): void {
         this.destination = nodePointedTo;
     }
 
-    public deref() {
+    public deref(): Node {
         return this.destination;
     }
 
@@ -44,13 +43,13 @@ export class Pointer {
 
         const arrowLength = 20;
 
-        for (let i of [0, 1]) {
+        for (const i of [0, 1]) {
             this.arrowhead[i].set({
                 x1: x2 + arrowLength * Math.cos(arrowAngles[i]),
                 y1: y2 + arrowLength * Math.sin(arrowAngles[i]),
                 x2,
                 y2,
-            })
+            });
         }
     }
 

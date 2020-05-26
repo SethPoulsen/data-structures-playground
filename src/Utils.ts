@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 
 
-export function makeLine(coords: number[] = [0, 0, 0, 0]) {
+export function makeLine(coords: number[] = [0, 0, 0, 0]): fabric.Line {
     return new fabric.Line(coords, {
       fill: 'black',
       stroke: 'black',
