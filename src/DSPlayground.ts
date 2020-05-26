@@ -2,9 +2,9 @@ import { LinkedList } from "./LinkedList";
 
 
 function setControlsBoxStyle(control: HTMLDivElement) {
-    control.style.width = "33%"
-    control.style.height = "200px"
-    control.style.border = "1px solid black"; 
+    control.style.width = "33%";
+    control.style.height = "200px";
+    control.style.border = "1px solid black";
     control.style.padding = "10px";
 }
 
@@ -23,7 +23,7 @@ export class DSPlayground {
 
     constructor(root: HTMLDivElement) {
         console.log("Made a new DSPlayground!");
-        
+
         let canvasEl = document.createElement("canvas");
         canvasEl.width = 1000;
         canvasEl.height = 500;
@@ -38,65 +38,65 @@ export class DSPlayground {
         this.controls.style.display = "flex";
 
         let createNodeDiv = this.createControlsDiv(`
-            <div style="font-size: 1.2em; padding: 2px;" > 
-                <u> Create a new node </u>  
+            <div style="font-size: 1.2em; padding: 2px;" >
+                <u> Create a new node </u>
             </div> <div></div>
-            <div style="padding: 2px;"> 
+            <div style="padding: 2px;">
                 Create a node with value
-                <input style="padding: 2px; width: 100px;" type="number"> 
+                <input style="padding: 2px; width: 100px;" type="number">
                 </input>
             </div>
-            <div style="padding: 2px;"> 
-                which is pointed to by 
+            <div style="padding: 2px;">
+                which is pointed to by
                 <select> </select>
             </div>
-            <div style="padding: 2px;"> 
-                <button id="createNodeButton" 
-                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px"> 
-                    Create! 
+            <div style="padding: 2px;">
+                <button id="createNodeButton"
+                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
+                    Create!
                 </button>
             </div
         `);
 
         let createPointerDiv = this.createControlsDiv(`
-            <div style="font-size: 1.2em; padding: 2px;" > 
-                <u> Create a new Pointer </u>  
+            <div style="font-size: 1.2em; padding: 2px;" >
+                <u> Create a new Pointer </u>
             </div> <div></div>
-            <div style="padding: 2px;"> 
+            <div style="padding: 2px;">
                 Create a new pointer called
-                <input style="padding: 2px; width: 100px;" > 
+                <input style="padding: 2px; width: 100px;" >
                 </input>
             </div>
-            <div style="padding: 2px;"> 
-                <button id="createPointerButton" 
-                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px"> 
-                    Create! 
+            <div style="padding: 2px;">
+                <button id="createPointerButton"
+                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
+                    Create!
                 </button>
             </div
         `);
 
         let reassignPointerDiv = this.createControlsDiv(`
-            <div style="font-size: 1.2em; padding: 2px;" > 
-                <u> Move/Reassign a pointer </u>  
+            <div style="font-size: 1.2em; padding: 2px;" >
+                <u> Move/Reassign a pointer </u>
             </div> <div></div>
-            <div style="padding: 2px;"> 
+            <div style="padding: 2px;">
                 Reassign the pointer
                 <select> </select>
 
             </div>
-            <div style="padding: 2px;"> 
-                to point to the same location as the pointer 
+            <div style="padding: 2px;">
+                to point to the same location as the pointer
                 <select> </select>
             </div>
-            <div style="padding: 2px;"> 
-                <button id="reassignPointerButton" 
-                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px"> 
-                    Reassign! 
+            <div style="padding: 2px;">
+                <button id="reassignPointerButton"
+                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
+                    Reassign!
                 </button>
             </div
         `);
 
-        // TODO: create another controls box for the user to input a list of numbers 
+        // TODO: create another controls box for the user to input a list of numbers
         // to initialize the list
         let ll = new LinkedList(canvasEl);
 
