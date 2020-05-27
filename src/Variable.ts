@@ -1,6 +1,8 @@
 import { fabric } from "fabric";
 import { Pointer } from "./Pointer";
 import { Point } from "./Types";
+import { Node } from "./Node";
+import { calculateAngle } from "./Utils";
 
 export class Variable {
     private name: string;
@@ -44,7 +46,7 @@ export class Variable {
      * Return the location where the pointer touches this variable on the canvas.
      * @param angle the angle at which the pointer will be drawn, in radians.
      */
-    public getContactPoint(angle: number): Point {
+    public getTailContactPoint(angle: number): Point {
         // r is distance from center to contact point
         // take minimum to determine if it intersects the vertical or horizontal boundary first
         const r = Math.min(
@@ -56,6 +58,10 @@ export class Variable {
             x: this.representation.left + Math.cos(angle) * r,
             y: this.representation.top + Math.sin(angle) * r
         };
+    }
+
+    public getAngleTo(other: Node): number {
+        return calculateAngle(this.getCenter(), other.getCenter());
     }
 
     public getCenter(): Point {

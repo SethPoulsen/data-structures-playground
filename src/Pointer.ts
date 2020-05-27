@@ -30,13 +30,10 @@ export class Pointer {
     public draw(): void {
         if (this.destination === null) return;
 
-        const pointerAngle = Math.atan2(
-            this.destination.getCenter().y - this.origin.getCenter().y,
-            this.destination.getCenter().x - this.origin.getCenter().x,
-        );
+        const pointerAngle = this.origin.getAngleTo(this.destination);
 
-        const { x: x1, y: y1 } = this.origin.getContactPoint(pointerAngle);
-        const { x: x2, y: y2 } = this.destination.getContactPoint(pointerAngle + Math.PI);
+        const { x: x1, y: y1 } = this.origin.getTailContactPoint(pointerAngle);
+        const { x: x2, y: y2 } = this.destination.getHeadContactPoint(pointerAngle);
         const arrowAngles = [pointerAngle + 3 * Math.PI / 4, pointerAngle - 3 * Math.PI / 4];
 
         this.line.set({ x1, x2, y1, y2 });
@@ -52,5 +49,4 @@ export class Pointer {
             });
         }
     }
-
 }

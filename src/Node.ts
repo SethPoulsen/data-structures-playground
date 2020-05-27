@@ -20,7 +20,11 @@ export abstract class Node {
      * Return the location where the pointer tail should touch this node.
      * @param angle the angle at which the pointer will be drawn, in radians.
      */
-    public abstract getContactPoint(angle: number): Point;
+    public abstract getTailContactPoint(angle: number): Point;
+
+    public abstract getHeadContactPoint(angle: number): Point;
 
     public abstract getCenter(): Point;
+
+    public abstract getAngleTo(other: Node): number;
 }
