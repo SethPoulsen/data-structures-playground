@@ -33,7 +33,10 @@ export class CircularNode extends Node {
     }
 
     public getHeadContactPoint(angle: number): Point {
-        return this.getTailContactPoint(angle + Math.PI);
+        return {
+            x: this.representation.left - Math.cos(angle) * Config.NODE_SIZE,
+            y: this.representation.top - Math.sin(angle) * Config.NODE_SIZE,
+        };
     }
 
     public getTailContactPoint(angle: number): Point {
