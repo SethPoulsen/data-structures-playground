@@ -82,7 +82,7 @@ var DSPlayground =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/DSPlayground.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -31925,6 +31925,108 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/Config.ts":
+/*!***********************!*\
+  !*** ./src/Config.ts ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.NODE_SPACE = exports.NODE_SIZE = exports.LIST_X = exports.LIST_Y = void 0;
+exports.LIST_Y = 100;
+exports.LIST_X = 100;
+exports.NODE_SIZE = 40;
+exports.NODE_SPACE = 200;
+
+
+/***/ }),
+
+/***/ "./src/DSPlayground.ts":
+/*!*****************************!*\
+  !*** ./src/DSPlayground.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.DSPlayground = void 0;
+var LinkedList_1 = __webpack_require__(/*! ./LinkedList */ "./src/LinkedList.ts");
+function setControlsBoxStyle(control) {
+    control.style.width = "33%";
+    control.style.height = "200px";
+    control.style.border = "1px solid black";
+    control.style.padding = "10px";
+}
+var DSPlayground = /** @class */ (function () {
+    function DSPlayground(root) {
+        var _this = this;
+        console.log("Made a new DSPlayground!");
+        var canvasEl = document.createElement("canvas");
+        canvasEl.width = 1000;
+        canvasEl.height = 500;
+        canvasEl.style.width = canvasEl.width + "px";
+        canvasEl.style.height = canvasEl.height + "px";
+        root.append(canvasEl);
+        this.controls = document.createElement("div");
+        root.append(this.controls);
+        this.controls.style.width = "1000px";
+        this.controls.style.height = "200px";
+        this.controls.style.display = "flex";
+        var createNodeDiv = this.createControlsDiv("\n            <div style=\"font-size: 1.2em; padding: 2px;\" >\n                <u> Create a new node </u>\n            </div> <div></div>\n            <div style=\"padding: 2px;\">\n                Create a node with value\n                <input style=\"padding: 2px; width: 100px;\" type=\"number\">\n                </input>\n            </div>\n            <div style=\"padding: 2px;\">\n                which is pointed to by\n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\">\n                <button id=\"createNodeButton\"\n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\">\n                    Create!\n                </button>\n            </div\n        ");
+        var createPointerDiv = this.createControlsDiv("\n            <div style=\"font-size: 1.2em; padding: 2px;\" >\n                <u> Create a new Pointer </u>\n            </div> <div></div>\n            <div style=\"padding: 2px;\">\n                Create a new pointer called\n                <input style=\"padding: 2px; width: 100px;\" >\n                </input>\n            </div>\n            <div style=\"padding: 2px;\">\n                <button id=\"createPointerButton\"\n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\">\n                    Create!\n                </button>\n            </div\n        ");
+        var reassignPointerDiv = this.createControlsDiv("\n            <div style=\"font-size: 1.2em; padding: 2px;\" >\n                <u> Move/Reassign a pointer </u>\n            </div> <div></div>\n            <div style=\"padding: 2px;\">\n                Reassign the pointer\n                <select> </select>\n\n            </div>\n            <div style=\"padding: 2px;\">\n                to point to the same location as the pointer\n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\">\n                <button id=\"reassignPointerButton\"\n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\">\n                    Reassign!\n                </button>\n            </div\n        ");
+        // TODO: create another controls box for the user to input a list of numbers
+        // to initialize the list
+        var ll = new LinkedList_1.LinkedList(canvasEl);
+        createPointerDiv.querySelector("button").addEventListener("click", function () {
+            var inputEl = createPointerDiv.querySelector("input");
+            ll.createPointer(inputEl.value);
+            inputEl.value = "";
+            _this.updateDropdownOptions(ll);
+        });
+        createNodeDiv.querySelector("button").addEventListener("click", function () {
+            var inputEl = createNodeDiv.querySelector("input");
+            var selectEl = createNodeDiv.querySelector("select");
+            var pointerName = selectEl.selectedOptions[0].value;
+            ll.createNode(parseInt(inputEl.value), pointerName);
+            inputEl.value = "";
+            _this.updateDropdownOptions(ll);
+        });
+        reassignPointerDiv.querySelector("button").addEventListener("click", function () {
+            var selectEls = reassignPointerDiv.querySelectorAll("select");
+            var lhsPointer = selectEls[0].selectedOptions[0].value;
+            var rhsPointer = selectEls[1].selectedOptions[0].value;
+            ll.reassignPointer(lhsPointer, rhsPointer);
+            _this.updateDropdownOptions(ll);
+        });
+    }
+    DSPlayground.prototype.createControlsDiv = function (html) {
+        var div = document.createElement("div");
+        setControlsBoxStyle(div);
+        div.innerHTML = html;
+        this.controls.appendChild(div);
+        return div;
+    };
+    DSPlayground.prototype.updateDropdownOptions = function (ll) {
+        var options = "";
+        for (var _i = 0, _a = ll.getAccessibleNames(); _i < _a.length; _i++) {
+            var varName = _a[_i];
+            options += "<option>" + varName + "</option>";
+        }
+        this.controls.querySelectorAll("select").forEach(function (selectEl) { return selectEl.innerHTML = options; });
+    };
+    return DSPlayground;
+}());
+exports.DSPlayground = DSPlayground;
+
+
+/***/ }),
+
 /***/ "./src/LinkedList.ts":
 /*!***************************!*\
   !*** ./src/LinkedList.ts ***!
@@ -31935,31 +32037,68 @@ module.exports = g;
 "use strict";
 
 exports.__esModule = true;
+exports.LinkedList = void 0;
 var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
-var Node = /** @class */ (function () {
-    function Node() {
-    }
-    return Node;
-}());
-exports.Node = Node;
+var Node_1 = __webpack_require__(/*! ./Node */ "./src/Node.ts");
+var Variable_1 = __webpack_require__(/*! ./Variable */ "./src/Variable.ts");
 var LinkedList = /** @class */ (function () {
     function LinkedList(canvasEl) {
-        var canvas = new fabric_1.fabric.Canvas(canvasEl);
-        var circle = new fabric_1.fabric.Circle({
-            radius: 40,
-            fill: '#00000000',
-            left: 100,
-            top: 100,
-            stroke: 'black',
-            strokeWidth: 2
-        });
-        var num = new fabric_1.fabric.IText('7', {
-            left: 130,
-            top: 120,
-            fill: '#black'
-        });
-        canvas.add(circle, num);
+        var _this = this;
+        this.canvas = new fabric_1.fabric.Canvas(canvasEl);
+        this.canvas.selection = false;
+        // this allows us to draw circles using the coordinates of their centers
+        fabric_1.fabric.Object.prototype.originX = fabric_1.fabric.Object.prototype.originY = 'center';
+        this.nodes = [];
+        this.globalVars = {};
+        this.draw();
+        this.canvas.on('object:moving', function () { return _this.draw(); });
     }
+    LinkedList.prototype.draw = function () {
+        for (var key in this.globalVars) {
+            this.globalVars[key].draw();
+        }
+        for (var _i = 0, _a = this.nodes; _i < _a.length; _i++) {
+            var node = _a[_i];
+            node.draw();
+        }
+        this.canvas.renderAll();
+    };
+    LinkedList.prototype.getAccessibleNames = function () {
+        var names = [];
+        for (var key in this.globalVars) {
+            names = names.concat(this.globalVars[key].getAccessibleNames());
+        }
+        return names;
+    };
+    LinkedList.prototype.createPointer = function (name) {
+        this.globalVars[name] = new Variable_1.Variable(name, this.canvas);
+        this.draw();
+    };
+    LinkedList.prototype.createNode = function (value, pointerToNode) {
+        var node = new Node_1.Node(value, this.canvas);
+        this.nodes.push(node);
+        this.getPointerFromString(pointerToNode).set(node);
+        this.draw();
+    };
+    LinkedList.prototype.reassignPointer = function (lhs, rhs) {
+        this.getPointerFromString(lhs).set(this.getPointerFromString(rhs).deref());
+        this.draw();
+    };
+    LinkedList.prototype.getPointerFromString = function (str) {
+        var _a = str.split("->"), firstToken = _a[0], next = _a[1];
+        if (!(firstToken in this.globalVars)) {
+            throw Error("Invalid string; first token is not a global variable");
+        }
+        else if (next === undefined) {
+            return this.globalVars[firstToken].pointer;
+        }
+        else if (next === "next") {
+            return this.globalVars[firstToken].pointer.deref().next;
+        }
+        else {
+            throw Error("Only member pointers names 'next' are supported right now.");
+        }
+    };
     return LinkedList;
 }());
 exports.LinkedList = LinkedList;
@@ -31967,9 +32106,132 @@ exports.LinkedList = LinkedList;
 
 /***/ }),
 
-/***/ "./src/index.ts":
+/***/ "./src/Node.ts":
+/*!*********************!*\
+  !*** ./src/Node.ts ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.Node = void 0;
+var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+var Pointer_1 = __webpack_require__(/*! ./Pointer */ "./src/Pointer.ts");
+var Config = __webpack_require__(/*! ./Config */ "./src/Config.ts");
+var Node = /** @class */ (function () {
+    function Node(data, canvas) {
+        this.data = data;
+        this.next = new Pointer_1.Pointer(this, canvas);
+        var circle = new fabric_1.fabric.Circle({
+            radius: Config.NODE_SIZE,
+            fill: '#00000000',
+            stroke: 'black',
+            strokeWidth: 2
+        });
+        var text = new fabric_1.fabric.IText(this.data.toString(), {
+            fill: '#black',
+            evented: false,
+            selectable: false
+        });
+        this.representation = new fabric_1.fabric.Group([circle, text], {
+            hasControls: false,
+            hasBorders: false,
+            hoverCursor: "grab",
+            moveCursor: "grabbing"
+        });
+        canvas.add(this.representation);
+        this.representation.center();
+    }
+    Node.prototype.draw = function () {
+        this.next.draw();
+    };
+    /**
+     * Return the location where the pointer touches this node.
+     * @param angle the angle at which the pointer will be drawn, in radians.
+     */
+    Node.prototype.getContactPoint = function (angle) {
+        return {
+            x: this.representation.left + Math.cos(angle) * Config.NODE_SIZE,
+            y: this.representation.top + Math.sin(angle) * Config.NODE_SIZE
+        };
+    };
+    Node.prototype.getCenter = function () {
+        return {
+            x: this.representation.left,
+            y: this.representation.top
+        };
+    };
+    return Node;
+}());
+exports.Node = Node;
+
+
+/***/ }),
+
+/***/ "./src/Pointer.ts":
+/*!************************!*\
+  !*** ./src/Pointer.ts ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
+exports.__esModule = true;
+exports.Pointer = void 0;
+var Utils_1 = __webpack_require__(/*! ./Utils */ "./src/Utils.ts");
+var Pointer = /** @class */ (function () {
+    function Pointer(origin, canvas) {
+        this.origin = origin;
+        this.destination = null;
+        this.line = Utils_1.makeLine();
+        this.arrowhead = [Utils_1.makeLine(), Utils_1.makeLine()];
+        canvas.add.apply(canvas, __spreadArrays([this.line], this.arrowhead));
+    }
+    Pointer.prototype.set = function (nodePointedTo) {
+        this.destination = nodePointedTo;
+    };
+    Pointer.prototype.deref = function () {
+        return this.destination;
+    };
+    Pointer.prototype.draw = function () {
+        if (this.destination === null)
+            return;
+        var pointerAngle = Math.atan2(this.destination.getCenter().y - this.origin.getCenter().y, this.destination.getCenter().x - this.origin.getCenter().x);
+        var _a = this.origin.getContactPoint(pointerAngle), x1 = _a.x, y1 = _a.y;
+        var _b = this.destination.getContactPoint(pointerAngle + Math.PI), x2 = _b.x, y2 = _b.y;
+        var arrowAngles = [pointerAngle + 3 * Math.PI / 4, pointerAngle - 3 * Math.PI / 4];
+        this.line.set({ x1: x1, x2: x2, y1: y1, y2: y2 });
+        var arrowLength = 20;
+        for (var _i = 0, _c = [0, 1]; _i < _c.length; _i++) {
+            var i = _c[_i];
+            this.arrowhead[i].set({
+                x1: x2 + arrowLength * Math.cos(arrowAngles[i]),
+                y1: y2 + arrowLength * Math.sin(arrowAngles[i]),
+                x2: x2,
+                y2: y2
+            });
+        }
+    };
+    return Pointer;
+}());
+exports.Pointer = Pointer;
+
+
+/***/ }),
+
+/***/ "./src/Utils.ts":
 /*!**********************!*\
-  !*** ./src/index.ts ***!
+  !*** ./src/Utils.ts ***!
   \**********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -31977,45 +32239,86 @@ exports.LinkedList = LinkedList;
 "use strict";
 
 exports.__esModule = true;
-var LinkedList_1 = __webpack_require__(/*! ./LinkedList */ "./src/LinkedList.ts");
-function setControlsBoxStyle(control) {
-    control.style.width = "33%";
-    control.style.height = "200px";
-    control.style.border = "1px solid black";
-    control.style.padding = "10px";
-    // control.style.borderLeft = "2px solid black";
+exports.makeLine = void 0;
+var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+function makeLine(coords) {
+    if (coords === void 0) { coords = [0, 0, 0, 0]; }
+    return new fabric_1.fabric.Line(coords, {
+        fill: 'black',
+        stroke: 'black',
+        strokeWidth: 2,
+        selectable: false,
+        evented: false
+    });
 }
-var DSPlayground = /** @class */ (function () {
-    function DSPlayground(root) {
-        console.log("Made a new DSPlayground!");
-        var canvasEl = document.createElement("canvas");
-        canvasEl.width = 1000;
-        canvasEl.height = 500;
-        canvasEl.style.width = canvasEl.width + "px";
-        canvasEl.style.height = canvasEl.height + "px";
-        root.append(canvasEl);
-        var controlsDiv = document.createElement("div");
-        root.append(controlsDiv);
-        controlsDiv.style.width = "1000px";
-        controlsDiv.style.height = "200px";
-        controlsDiv.style.display = "flex";
-        var createNodeDiv = document.createElement("div");
-        var createPointerDiv = document.createElement("div");
-        var reassignPointerDiv = document.createElement("div");
-        setControlsBoxStyle(createNodeDiv);
-        setControlsBoxStyle(createPointerDiv);
-        setControlsBoxStyle(reassignPointerDiv);
-        createNodeDiv.innerHTML = "\n            <div style=\"font-size: 1.2em; padding: 2px;\" > \n                <u> Create a new node </u>  \n            </div> <div></div>\n            <div style=\"padding: 2px;\"> \n                Create a node with value\n                <input style=\"padding: 2px; width: 100px;\" type=\"number\"> \n                </input>\n            </div>\n            <div style=\"padding: 2px;\"> \n                with its next pointer pointing to \n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\"> \n                <button id=\"createNodeButton\" \n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\"> \n                    Create! \n                </button>\n            </div\n        ";
-        createPointerDiv.innerHTML = "\n            <div style=\"font-size: 1.2em; padding: 2px;\" > \n                <u> Create a new Pointer </u>  \n            </div> <div></div>\n            <div style=\"padding: 2px;\"> \n                Create a new pointer called\n                <input style=\"padding: 2px; width: 100px;\" > \n                </input>\n            </div>\n            <div style=\"padding: 2px;\"> \n                to point to the same location as the pointer \n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\"> \n                <button id=\"createNodeButton\" \n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\"> \n                    Create! \n                </button>\n            </div\n        ";
-        reassignPointerDiv.innerHTML = "\n            <div style=\"font-size: 1.2em; padding: 2px;\" > \n                <u> Move/Reassign a pointer </u>  \n            </div> <div></div>\n            <div style=\"padding: 2px;\"> \n                Reassign the pointer\n                <select> </select>\n\n            </div>\n            <div style=\"padding: 2px;\"> \n                to point to the same location as the pointer \n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\"> \n                <button id=\"createNodeButton\" \n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\"> \n                    Reassign! \n                </button>\n            </div\n        ";
-        controlsDiv.append(createNodeDiv);
-        controlsDiv.append(createPointerDiv);
-        controlsDiv.append(reassignPointerDiv);
-        var ll = new LinkedList_1.LinkedList(canvasEl);
+exports.makeLine = makeLine;
+
+
+/***/ }),
+
+/***/ "./src/Variable.ts":
+/*!*************************!*\
+  !*** ./src/Variable.ts ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.Variable = void 0;
+var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+var Pointer_1 = __webpack_require__(/*! ./Pointer */ "./src/Pointer.ts");
+var Variable = /** @class */ (function () {
+    function Variable(name, canvas) {
+        this.name = name;
+        this.pointer = new Pointer_1.Pointer(this, canvas);
+        var text = new fabric_1.fabric.IText(this.name, {
+            fill: '#black',
+            evented: false,
+            selectable: false
+        });
+        this.representation = new fabric_1.fabric.Group([text], {
+            hasControls: false,
+            hasBorders: false,
+            hoverCursor: "grab",
+            moveCursor: "grabbing"
+        });
+        canvas.add(this.representation);
+        this.representation.center();
     }
-    return DSPlayground;
+    Variable.prototype.getAccessibleNames = function () {
+        var pointers = [this.name];
+        if (this.pointer.deref() !== null) {
+            pointers.push(this.name + "->next");
+        }
+        return pointers;
+    };
+    Variable.prototype.draw = function () {
+        this.pointer.draw();
+    };
+    /**
+     * Return the location where the pointer touches this variable on the canvas.
+     * @param angle the angle at which the pointer will be drawn, in radians.
+     */
+    Variable.prototype.getContactPoint = function (angle) {
+        // r is distance from center to contact point
+        // take minimum to determine if it intersects the vertical or horizontal boundary first
+        var r = Math.min(Math.abs((this.representation.width / 2) / Math.cos(angle)), Math.abs((this.representation.height / 2) / Math.sin(angle)));
+        return {
+            x: this.representation.left + Math.cos(angle) * r,
+            y: this.representation.top + Math.sin(angle) * r
+        };
+    };
+    Variable.prototype.getCenter = function () {
+        return {
+            x: this.representation.left,
+            y: this.representation.top
+        };
+    };
+    return Variable;
 }());
-exports.DSPlayground = DSPlayground;
+exports.Variable = Variable;
 
 
 /***/ }),
