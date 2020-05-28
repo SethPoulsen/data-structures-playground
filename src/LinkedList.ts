@@ -2,6 +2,7 @@ import { fabric } from "fabric";
 import { Node } from "./Node";
 import { Variable } from "./Variable";
 import { Pointer } from "./Pointer";
+import { BoxNode } from "./BoxNode";
 
 export class LinkedList {
 
@@ -51,7 +52,7 @@ export class LinkedList {
     }
 
     public createNode(value: number, pointerToNode: string): void {
-        const node = new Node(value, this.canvas);
+        const node = new BoxNode(value, this.canvas);
         this.nodes.push(node);
         this.getPointerFromString(pointerToNode).set(node);
 
