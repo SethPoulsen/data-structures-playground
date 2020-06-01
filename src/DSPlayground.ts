@@ -1,5 +1,5 @@
 import { LinkedList } from "./LinkedList";
-
+import { DSOperation, CreateNode, CreatePointer, AssignPointer } from "./Operations";
 
 function setControlsBoxStyle(control: HTMLDivElement) {
     control.style.width = "33%";
@@ -12,6 +12,13 @@ function setControlsBoxStyle(control: HTMLDivElement) {
 export class DSPlayground {
 
     private controls: HTMLDivElement;
+
+    private undoButton: HTMLButtonElement;
+    private redoButton: HTMLButtonElement;
+    private undoStack: DSOperation[] = [];
+    private redoStack: DSOperation[] = [];
+
+    private linkedList: LinkedList;
 
     private createControlsDiv(html: string) {
         const div = document.createElement("div");
@@ -75,12 +82,12 @@ export class DSPlayground {
             </div
         `);
 
-        const reassignPointerDiv = this.createControlsDiv(`
+        const assignPointerDiv = this.createControlsDiv(`
             <div style="font-size: 1.2em; padding: 2px;" >
-                <u> Move/Reassign a pointer </u>
+                <u> Assign a pointer </u>
             </div> <div></div>
             <div style="padding: 2px;">
-                Reassign the pointer
+                Assign the pointer
                 <select> </select>
 
             </div>
@@ -89,41 +96,83 @@ export class DSPlayground {
                 <select> </select>
             </div>
             <div style="padding: 2px;">
-                <button id="reassignPointerButton"
+                <button id="assignPointerButton"
                     style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
-                    Reassign!
+                    Assign!
                 </button>
             </div
         `);
 
         // TODO: create another controls box for the user to input a list of numbers
         // to initialize the list
-        const ll = new LinkedList(canvasEl);
+
+        this.createControlsDiv(`
+            <div style="padding: 2px;">
+                <button id="undoButton"
+                    style="background-color: #87CEFA; height: 30px; width: 100px">
+                    Undo
+                </button>
+                <button id="redoButton"
+                    style="background-color: #87CEFA; height: 30px; width: 100px">
+                    Redo
+            </button>
+            </div
+        `);
+
+        this.linkedList = new LinkedList(canvasEl);
 
         createPointerDiv.querySelector("button").addEventListener("click", () => {
             const inputEl = createPointerDiv.querySelector("input");
-            ll.createPointer(inputEl.value);
+
+            this.performOperation(new CreatePointer(inputEl.value));
+
             inputEl.value = "";
-            this.updateDropdownOptions(ll);
+            this.updateDropdownOptions(this.linkedList);
         });
 
         createNodeDiv.querySelector("button").addEventListener("click", () => {
             const inputEl = createNodeDiv.querySelector("input");
             const selectEl = createNodeDiv.querySelector("select");
             const pointerName = selectEl.selectedOptions[0].value;
-            ll.createNode(parseInt(inputEl.value), pointerName);
+
+            const operation = new CreateNode(parseInt(inputEl.value), pointerName);
+            this.performOperation(operation);
+
             inputEl.value = "";
-            this.updateDropdownOptions(ll);
+            this.updateDropdownOptions(this.linkedList);
         });
 
-        reassignPointerDiv.querySelector("button").addEventListener("click", () => {
-            const selectEls = reassignPointerDiv.querySelectorAll("select");
-
+        assignPointerDiv.querySelector("button").addEventListener("click", () => {
+            const selectEls = assignPointerDiv.querySelectorAll("select");
             const lhsPointer = selectEls[0].selectedOptions[0].value;
             const rhsPointer = selectEls[1].selectedOptions[0].value;
-            ll.reassignPointer(lhsPointer, rhsPointer);
-            this.updateDropdownOptions(ll);
+
+            const operation = new AssignPointer(lhsPointer, rhsPointer);
+            this.performOperation(operation);
+
+            this.updateDropdownOptions(this.linkedList);
         });
+
+        this.undoButton = <HTMLButtonElement> document.getElementById("undoButton");
+        this.undoButton.addEventListener("click", () => {
+            const lastOp = this.undoStack.pop();
+            if (!lastOp) {
+                return;
+            }
+            this.undoOperation(lastOp);
+            this.redoStack.push(lastOp);
+        });
+
+        this.redoButton = <HTMLButtonElement> document.getElementById("redoButton");
+        this.redoButton.addEventListener("click", () => {
+            const lastOp = this.redoStack.pop();
+            if (!lastOp) {
+                return;
+            }
+            this.performOperationInternal(lastOp);
+            this.undoStack.push(lastOp);
+        });
+
     }
 
     private updateDropdownOptions(ll: LinkedList): void {
@@ -133,4 +182,36 @@ export class DSPlayground {
         }
         this.controls.querySelectorAll("select").forEach(selectEl => selectEl.innerHTML = options);
     }
+
+    private performOperation(op: DSOperation): void {
+        this.performOperationInternal(op);
+        this.redoStack = []; // TODO also grey out UI to show its not usable
+        this.undoStack.push(op);
+    }
+
+    private undoOperation(op: DSOperation): void {
+        if (op.type === "CreateNode") {
+            this.linkedList.unCreateNode(op as CreateNode);
+        } else if (op.type === "CreatePointer") {
+            this.linkedList.unCreatePointer(op as CreatePointer);
+        } else if (op.type === "AssignPointer") {
+            this.linkedList.unAssignPointer(op as AssignPointer);
+        } else {
+            throw(new Error("Unsupported Operation"));
+        }
+    }
+
+    private performOperationInternal(op: DSOperation): void {
+        if (op.type === "CreateNode") {
+            (op as CreateNode).oldDestination = this.linkedList.createNode(op as CreateNode);
+        } else if (op.type === "CreatePointer") {
+            this.linkedList.createPointer(op as CreatePointer);
+        } else if (op.type === "AssignPointer") {
+            (op as AssignPointer).oldDestination = this.linkedList.assignPointer(op as AssignPointer);
+        } else {
+            throw(new Error("Unsupported Operation"));
+        }
+    }
+
+
 }

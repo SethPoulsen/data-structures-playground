@@ -10,8 +10,11 @@ export class Pointer {
     private line: fabric.Line;
     private arrowhead: fabric.Line[];
 
+    private canvas: fabric.Canvas;
+
     constructor(origin: Node | Variable, canvas: fabric.Canvas) {
         this.origin = origin;
+        this.canvas = canvas;
         this.destination = null;
 
         this.line = makeLine();
@@ -48,5 +51,9 @@ export class Pointer {
                 y2,
             });
         }
+    }
+
+    public erase(): void {
+        this.canvas.remove(this.line, ...this.arrowhead);
     }
 }
