@@ -7,9 +7,11 @@ export abstract class Node {
     public data: number;
     public next: Pointer
     protected representation: fabric.Group;
+    private canvas: fabric.Canvas;
 
     constructor(data: number, canvas: fabric.Canvas, pointerOrigin: Point) {
         this.data = data;
+        this.canvas = canvas;
         this.next = new Pointer(this, canvas);
 
         this.representation = new fabric.Group(this.createFabricObjects(), {
@@ -41,4 +43,9 @@ export abstract class Node {
     public abstract getCenter(): Point;
 
     public abstract getAngleTo(other: Node): number;
+
+    public erase(): void {
+        this.canvas.remove(this.representation);
+        this.next.erase();
+    }
 }

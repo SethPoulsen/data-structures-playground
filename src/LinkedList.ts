@@ -3,6 +3,7 @@ import { Node } from "./Node";
 import { Variable } from "./Variable";
 import { Pointer } from "./Pointer";
 import { BoxNode } from "./BoxNode";
+import { CreateNode, CreatePointer, AssignPointer as AssignPointer } from "./Operations";
 
 export class LinkedList {
 
@@ -46,22 +47,46 @@ export class LinkedList {
         return names;
     }
 
-    public createPointer(name: string): void {
-        this.globalVars[name] = new Variable(name, this.canvas);
+    public createPointer(op: CreatePointer): void {
+        this.globalVars[op.name] = new Variable(op.name, this.canvas);
         this.draw();
     }
 
-    public createNode(value: number, pointerToNode: string): void {
-        const ptr = this.getPointerFromString(pointerToNode);
-        const node = new BoxNode(value, this.canvas, ptr.getOriginLocation());
+    public createNode(op: CreateNode): Node {
+        const ptr = this.getPointerFromString(op.pointer);
+        const node = new BoxNode(op.value, this.canvas, ptr.getOriginLocation());
         this.nodes.push(node);
+        const oldDestination = ptr.deref();
         ptr.set(node);
+        this.draw();
+        return oldDestination;
+    }
 
+    public assignPointer(op: AssignPointer): Node {
+        const lhsPointer = this.getPointerFromString(op.lhs);
+        const oldDestination = lhsPointer.deref();
+        lhsPointer.set(this.getPointerFromString(op.rhs).deref());
+        this.draw();
+        return oldDestination;
+    }
+
+    public unCreatePointer(op: CreatePointer): void {
+        this.globalVars[op.name].erase();
+        delete this.globalVars[op.name];
+    }
+
+    public unCreateNode(op: CreateNode): void {
+        // put the pointer back where it was
+        this.getPointerFromString(op.pointer).set(op.oldDestination);
+
+        // get rid of the node
+        this.nodes[this.nodes.length - 1].erase();
+        this.nodes.pop();
         this.draw();
     }
 
-    public reassignPointer(lhs: string, rhs: string): void {
-        this.getPointerFromString(lhs).set(this.getPointerFromString(rhs).deref());
+    public unAssignPointer(op: AssignPointer): void {
+        this.getPointerFromString(op.lhs).set(op.oldDestination);
         this.draw();
     }
 

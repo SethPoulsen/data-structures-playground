@@ -8,9 +8,11 @@ export class Variable {
     private name: string;
     public pointer: Pointer;
     private representation: fabric.Group;
+    private canvas: fabric.Canvas;
 
     constructor(name: string, canvas: fabric.Canvas) {
         this.name = name;
+        this.canvas = canvas;
         this.pointer = new Pointer(this, canvas);
 
         const text = new fabric.IText(this.name, {
@@ -62,4 +64,10 @@ export class Variable {
             y: this.representation.top,
         };
     }
+
+    public erase() : void {
+        this.canvas.remove(this.representation);
+        this.pointer.erase();
+    }
+
 }

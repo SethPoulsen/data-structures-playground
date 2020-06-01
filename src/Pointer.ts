@@ -15,6 +15,7 @@ export class Pointer {
 
     constructor(origin: Node | Variable, canvas: fabric.Canvas) {
         this.origin = origin;
+        this.canvas = canvas;
         this.destination = null;
         this.canvas = canvas;
         this.line = makeLine();
@@ -81,4 +82,5 @@ export class Pointer {
     public erase(): void {
         this.canvas.remove(this.line, this.selfLoop, ...this.arrowhead);
     }
+
 }
