@@ -26,10 +26,11 @@ export class Variable {
             hasBorders: false,
             hoverCursor: "grab",
             moveCursor: "grabbing",
+            left: canvas.getWidth() * (0.8 * Math.random() + 0.1),
+            top: canvas.getHeight() * (0.8 * Math.random() + 0.1),
         });
 
         canvas.add(this.representation);
-        this.representation.center();
     }
 
     public getAccessibleNames(): string[] {
