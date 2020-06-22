@@ -2,6 +2,7 @@ import { fabric } from "fabric";
 import { makeLine } from "./Utils";
 import { Node } from "./Node";
 import { Variable } from "./Variable";
+import { Point } from "./Types";
 
 export class Pointer {
     private origin: Node | Variable;
@@ -49,4 +50,9 @@ export class Pointer {
             });
         }
     }
+
+    public getOriginLocation(): Point {
+        return this.origin.getCenter();
+    }
+
 }

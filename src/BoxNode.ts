@@ -5,7 +5,7 @@ import Config = require("./Config");
 import { makeLine, calculateAngle, getBoxIntersection } from "./Utils";
 
 export class BoxNode extends Node {
-    protected createFabricObjects() {
+    protected createFabricObjects(): fabric.Object[] {
         const box = new fabric.Rect({
             width: 2 * Config.NODE_SIZE,
             height: Config.NODE_SIZE,

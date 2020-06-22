@@ -1,25 +1,29 @@
 import { fabric } from "fabric";
 import { Pointer } from "./Pointer";
 import { Point } from "./Types";
+import Config = require("./Config");
 
 export abstract class Node {
     public data: number;
     public next: Pointer
     protected representation: fabric.Group;
 
-    constructor(data: number, canvas: fabric.Canvas) {
+    constructor(data: number, canvas: fabric.Canvas, pointer: Pointer) {
         this.data = data;
         this.next = new Pointer(this, canvas);
+
+        const {x, y} = pointer.getOriginLocation();
 
         this.representation = new fabric.Group(this.createFabricObjects(), {
             hasControls: false,
             hasBorders: false,
             hoverCursor: "grab",
             moveCursor: "grabbing",
+            left: Math.min(x + Config.NODE_SPACE, canvas.getWidth() - Config.NODE_SIZE),
+            top: y,
         });
 
         canvas.add(this.representation);
-        this.representation.center();
     }
 
     public draw(): void {
