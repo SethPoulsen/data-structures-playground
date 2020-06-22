@@ -5,9 +5,7 @@ import Config = require("./Config");
 import { makeLine, calculateAngle, getBoxIntersection } from "./Utils";
 
 export class BoxNode extends Node {
-    constructor(data: number, canvas: fabric.Canvas) {
-        super(data, canvas);
-
+    protected createFabricObjects() {
         const box = new fabric.Rect({
             width: 2 * Config.NODE_SIZE,
             height: Config.NODE_SIZE,
@@ -31,15 +29,7 @@ export class BoxNode extends Node {
             left: -Config.NODE_SIZE / 2,
         });
 
-        this.representation = new fabric.Group([box, divider, dot, text], {
-            hasControls: false,
-            hasBorders: false,
-            hoverCursor: "grab",
-            moveCursor: "grabbing",
-        });
-
-        canvas.add(this.representation);
-        this.representation.center();
+        return [box, divider, dot, text];
     }
 
     public getHeadContactPoint(angle: number): Point {

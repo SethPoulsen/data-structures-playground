@@ -5,9 +5,7 @@ import Config = require("./Config");
 import { calculateAngle } from "./Utils";
 
 export class CircularNode extends Node {
-    constructor(data: number, canvas: fabric.Canvas) {
-        super(data, canvas);
-
+    protected createFabricObjects() {
         const circle = new fabric.Circle({
             radius: Config.NODE_SIZE,
             fill: '#00000000',
@@ -21,15 +19,7 @@ export class CircularNode extends Node {
             selectable: false
         });
 
-        this.representation = new fabric.Group([circle, text], {
-            hasControls: false,
-            hasBorders: false,
-            hoverCursor: "grab",
-            moveCursor: "grabbing",
-        });
-
-        canvas.add(this.representation);
-        this.representation.center();
+        return [circle, text];
     }
 
     public getHeadContactPoint(angle: number): Point {
