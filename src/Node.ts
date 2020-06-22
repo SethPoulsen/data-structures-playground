@@ -10,11 +10,23 @@ export abstract class Node {
     constructor(data: number, canvas: fabric.Canvas) {
         this.data = data;
         this.next = new Pointer(this, canvas);
+
+        this.representation = new fabric.Group(this.createFabricObjects(), {
+            hasControls: false,
+            hasBorders: false,
+            hoverCursor: "grab",
+            moveCursor: "grabbing",
+        });
+
+        canvas.add(this.representation);
+        this.representation.center();
     }
 
     public draw(): void {
         this.next.draw();
     }
+
+    protected abstract createFabricObjects(): fabric.Object[];
 
     /**
      * Return the location where the pointer tail should touch this node.
