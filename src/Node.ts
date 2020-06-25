@@ -8,19 +8,17 @@ export abstract class Node {
     public next: Pointer
     protected representation: fabric.Group;
 
-    constructor(data: number, canvas: fabric.Canvas, pointer: Pointer) {
+    constructor(data: number, canvas: fabric.Canvas, pointerOrigin: Point) {
         this.data = data;
         this.next = new Pointer(this, canvas);
-
-        const {x, y} = pointer.getOriginLocation();
 
         this.representation = new fabric.Group(this.createFabricObjects(), {
             hasControls: false,
             hasBorders: false,
             hoverCursor: "grab",
             moveCursor: "grabbing",
-            left: Math.min(x + Config.NODE_SPACE, canvas.getWidth() - Config.NODE_SIZE),
-            top: y,
+            left: Math.min(pointerOrigin.x + Config.NODE_SPACE, canvas.getWidth() - Config.NODE_SIZE),
+            top: pointerOrigin.y,
         });
 
         canvas.add(this.representation);
