@@ -52,7 +52,7 @@ export class LinkedList {
     }
 
     public createNode(value: number, pointerToNode: string): void {
-        const node = new BoxNode(value, this.canvas);
+        const node = new BoxNode(value, this.canvas, this.getPointerFromString(pointerToNode));
         this.nodes.push(node);
         this.getPointerFromString(pointerToNode).set(node);
 
