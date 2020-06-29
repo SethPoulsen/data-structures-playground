@@ -1,4 +1,3 @@
-import { Node } from "./Node";
 
 export interface DSOperation {
     type: string;
@@ -7,11 +6,12 @@ export interface DSOperation {
 export class CreateNode implements DSOperation {
     public type = "CreateNode";
     public value: number;
-    public pointer: string;
-    public oldDestination: Node;
+    public id: number;
+    public pointer: AssignPointer;
 
-    constructor(value: number, pointer: string) {
+    constructor(value: number, id: number, pointer: AssignPointer) {
         this.value = value;
+        this.id = id;
         this.pointer = pointer;
     }
 }
@@ -28,11 +28,12 @@ export class CreatePointer implements DSOperation {
 export class AssignPointer implements DSOperation {
     public type = "AssignPointer";
     public lhs: string;
-    public rhs: string;
-    public oldDestination: Node;
+    public nodeId: number;
+    public oldNodeId: number;
 
-    constructor(lhs: string, rhs: string) {
+    constructor(lhs: string, nodeId: number, oldNodeId: number) {
         this.lhs = lhs;
-        this.rhs = rhs;
+        this.nodeId = nodeId;
+        this.oldNodeId = oldNodeId;
     }
 }

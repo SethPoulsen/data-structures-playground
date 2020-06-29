@@ -35,7 +35,7 @@ export class Variable {
 
     public getAccessibleNames(): string[] {
         const pointers = [this.name];
-        if (this.pointer.deref() !== null) {
+        if (this.pointer.deref()) {
             pointers.push(this.name + "->next");
         }
         return pointers;

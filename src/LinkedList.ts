@@ -8,7 +8,7 @@ import { CreateNode, CreatePointer, AssignPointer as AssignPointer } from "./Ope
 export class LinkedList {
 
     private globalVars: { [key: string]: Variable };
-    private nodes: Node[];
+    private nodes: { [id: number]: Node };
     private canvas: fabric.Canvas;
 
     constructor(canvasEl: HTMLCanvasElement) {
@@ -32,8 +32,8 @@ export class LinkedList {
             this.globalVars[key].draw();
         }
 
-        for (const node of this.nodes) {
-            node.draw();
+        for (const id in this.nodes) {
+            this.nodes[id].draw();
         }
 
         this.canvas.renderAll();
@@ -52,22 +52,18 @@ export class LinkedList {
         this.draw();
     }
 
-    public createNode(op: CreateNode): Node {
-        const ptr = this.getPointerFromString(op.pointer);
-        const node = new BoxNode(op.value, this.canvas, ptr.getOriginLocation());
-        this.nodes.push(node);
-        const oldDestination = ptr.deref();
-        ptr.set(node);
+    public createNode(op: CreateNode): void {
+        const node = new BoxNode(op.value, op.id, this.canvas,
+            this.getPointerFromString(op.pointer.lhs).getOriginLocation());
+        this.nodes[op.id] = node;
+        this.assignPointer(op.pointer);
         this.draw();
-        return oldDestination;
     }
 
-    public assignPointer(op: AssignPointer): Node {
+    public assignPointer(op: AssignPointer): void {
         const lhsPointer = this.getPointerFromString(op.lhs);
-        const oldDestination = lhsPointer.deref();
-        lhsPointer.set(this.getPointerFromString(op.rhs).deref());
+        lhsPointer.set(this.nodes[op.nodeId]);
         this.draw();
-        return oldDestination;
     }
 
     public unCreatePointer(op: CreatePointer): void {
@@ -77,16 +73,16 @@ export class LinkedList {
 
     public unCreateNode(op: CreateNode): void {
         // put the pointer back where it was
-        this.getPointerFromString(op.pointer).set(op.oldDestination);
+        this.unAssignPointer(op.pointer);
 
         // get rid of the node
-        this.nodes[this.nodes.length - 1].erase();
-        this.nodes.pop();
+        this.nodes[op.id].erase();
+        delete this.nodes[op.id];
         this.draw();
     }
 
     public unAssignPointer(op: AssignPointer): void {
-        this.getPointerFromString(op.lhs).set(op.oldDestination);
+        this.getPointerFromString(op.lhs).set(this.nodes[op.oldNodeId]);
         this.draw();
     }
 
@@ -102,4 +98,9 @@ export class LinkedList {
             throw Error("Only member pointers names 'next' are supported right now.");
         }
     }
+
+    public getNodeIdAt(pointer: string): number {
+        return this.getPointerFromString(pointer).deref()?.getId();
+    }
+
 }

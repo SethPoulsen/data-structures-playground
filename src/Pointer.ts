@@ -16,15 +16,17 @@ export class Pointer {
     constructor(origin: Node | Variable, canvas: fabric.Canvas) {
         this.origin = origin;
         this.canvas = canvas;
-        this.destination = null;
-        this.canvas = canvas;
         this.line = makeLine();
         this.selfLoop = new fabric.Path("",{ fill: '', stroke: 'black', objectCaching: false, strokeWidth: 2 });
         this.arrowhead = [makeLine(), makeLine()];
-        canvas.add(this.line, ...this.arrowhead);
     }
 
     public set(nodePointedTo: Node): void {
+        if (!this.destination && nodePointedTo) {
+            this.canvas.add(this.line, ...this.arrowhead);
+        } else if (this.destination && !nodePointedTo) {
+            this.erase();
+        }
         this.destination = nodePointedTo;
 
         this.erase();
@@ -41,7 +43,7 @@ export class Pointer {
     }
 
     public draw(): void {
-        if (this.destination === null) return;
+        if (!this.destination) return;
 
         let x1, y1, x2, y2, pointerAngle;
         if (this.destination == this.origin) {

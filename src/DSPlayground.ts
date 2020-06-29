@@ -1,6 +1,7 @@
 import { LinkedList } from "./LinkedList";
 import { validateVariableName } from "./VariableValidation";
 import { DSOperation, CreateNode, CreatePointer, AssignPointer } from "./Operations";
+import { generateFreshID } from "./IdGenerator";
 
 function setControlsBoxStyle(control: HTMLDivElement) {
     control.style.width = "33%";
@@ -143,7 +144,9 @@ export class DSPlayground {
             const selectEl = createNodeDiv.querySelector("select");
             const pointerName = selectEl.selectedOptions[0].value;
 
-            const operation = new CreateNode(parseInt(inputEl.value), pointerName);
+            const newNodeId = generateFreshID();
+            const assignPointer = new AssignPointer(pointerName, newNodeId, this.linkedList.getNodeIdAt(pointerName));
+            const operation = new CreateNode(parseInt(inputEl.value), newNodeId, assignPointer);
             this.performOperation(operation);
 
             inputEl.value = "";
@@ -155,7 +158,10 @@ export class DSPlayground {
             const lhsPointer = selectEls[0].selectedOptions[0].value;
             const rhsPointer = selectEls[1].selectedOptions[0].value;
 
-            const operation = new AssignPointer(lhsPointer, rhsPointer);
+            const operation = new AssignPointer(lhsPointer,
+                this.linkedList.getNodeIdAt(rhsPointer),
+                this.linkedList.getNodeIdAt(lhsPointer));
+
             this.performOperation(operation);
 
             this.updateDropdownOptions(this.linkedList);
@@ -211,11 +217,11 @@ export class DSPlayground {
 
     private performOperationInternal(op: DSOperation): void {
         if (op.type === "CreateNode") {
-            (op as CreateNode).oldDestination = this.linkedList.createNode(op as CreateNode);
+            this.linkedList.createNode(op as CreateNode);
         } else if (op.type === "CreatePointer") {
             this.linkedList.createPointer(op as CreatePointer);
         } else if (op.type === "AssignPointer") {
-            (op as AssignPointer).oldDestination = this.linkedList.assignPointer(op as AssignPointer);
+            this.linkedList.assignPointer(op as AssignPointer);
         } else {
             throw(new Error("Unsupported Operation"));
         }
