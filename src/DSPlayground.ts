@@ -1,5 +1,6 @@
 import { LinkedList } from "./LinkedList";
 
+const varNameRe = /[a-zA-Z_][a-zA-Z0-9_]*/g;
 
 function setControlsBoxStyle(control: HTMLDivElement) {
     control.style.width = "33%";
@@ -102,8 +103,20 @@ export class DSPlayground {
 
         createPointerDiv.querySelector("button").addEventListener("click", () => {
             const inputEl = createPointerDiv.querySelector("input");
-            ll.createPointer(inputEl.value);
+            const pointerName = inputEl.value;
             inputEl.value = "";
+
+            if (!varNameRe.test(pointerName)) {
+                alert("Variable names must start with a letter and contain only letters and numbers.");
+                return;
+            }
+            const names = ll.getAccessibleNames();
+            if (names.indexOf(pointerName) !== -1) {
+                alert("That variable name is already in use!");
+                return;
+            }
+
+            ll.createPointer(pointerName);
             this.updateDropdownOptions(ll);
         });
 
