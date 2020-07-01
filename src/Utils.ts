@@ -1,9 +1,9 @@
 import { fabric } from "fabric";
 import { Point } from "./Types";
 
-
-export function makeLine(coords: number[] = [0, 0, 0, 0]): fabric.Line {
-    return new fabric.Line(coords, {
+const origin: Point = { x: 0, y: 0 };
+export function makeLine(start: Point=origin, end: Point=origin): fabric.Line {
+    return new fabric.Line([start.x, start.y, end.x, end.y], {
         fill: 'black',
         stroke: 'black',
         strokeWidth: 2,

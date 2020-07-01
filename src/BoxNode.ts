@@ -14,7 +14,7 @@ export class BoxNode extends Node {
             strokeWidth: 2,
         });
 
-        const divider = makeLine([0, -Config.NODE_SIZE / 2, 0, Config.NODE_SIZE / 2]);
+        const divider = makeLine({x: 0, y: -Config.NODE_SIZE / 2}, {x: 0 , y: Config.NODE_SIZE / 2});
 
         const dot = new fabric.Circle({
             radius: Config.NODE_SIZE / 8,
