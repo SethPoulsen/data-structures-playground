@@ -9,7 +9,8 @@ export class Pointer {
     private origin: Node | Variable;
     private destination: Node;
     private canvas: fabric.Canvas;
-    private line: fabric.Line | fabric.Path;
+    private line: fabric.Line;
+    private selfLoop: fabric.Path;
     private arrowhead: fabric.Line[];
 
     constructor(origin: Node | Variable, canvas: fabric.Canvas) {
@@ -17,6 +18,7 @@ export class Pointer {
         this.destination = null;
         this.canvas = canvas;
         this.line = makeLine();
+        this.selfLoop = new fabric.Path("",{ fill: '', stroke: 'black', objectCaching: false, strokeWidth: 2 });
         this.arrowhead = [makeLine(), makeLine()];
         canvas.add(this.line, ...this.arrowhead);
     }
@@ -24,13 +26,13 @@ export class Pointer {
     public set(nodePointedTo: Node): void {
         this.destination = nodePointedTo;
 
-        this.canvas.remove(this.line);
-        if (nodePointedTo === this.origin) {
-            this.line = new fabric.Path("",{ fill: '', stroke: 'black', objectCaching: false, strokeWidth: 2 });
-        } else {
-            this.line = makeLine();
+        this.erase();
+        if (this.destination == this.origin) {
+            this.canvas.add(this.selfLoop, ...this.arrowhead);
+        } else if (this.destination) {
+            this.canvas.add(this.line, ...this.arrowhead);
         }
-        this.canvas.add(this.line);
+
     }
 
     public deref(): Node {
@@ -41,18 +43,18 @@ export class Pointer {
         if (this.destination === null) return;
 
         let x1, y1, x2, y2, pointerAngle;
-        if (this.line instanceof fabric.Path) {
+        if (this.destination == this.origin) {
             pointerAngle = 0.85;
             ({ x: x1, y: y1 } = this.origin.getTailContactPoint(0));
             ({ x: x2, y: y2 } = this.destination.getHeadContactPoint(0));
 
             const size = Config.NODE_SIZE * 3;
-            this.line.set("path", [
+            this.selfLoop.set("path", [
                 <any>["m", x1, y1],
                 <any>["c", size , -size , -size * 3/2, -size, x2 - x1, 0]
             ]);
 
-        } else if (this.line instanceof fabric.Line) {
+        } else {
             pointerAngle = this.origin.getAngleTo(this.destination);
             ({ x: x1, y: y1 } = this.origin.getTailContactPoint(pointerAngle));
             ({ x: x2, y: y2 } = this.destination.getHeadContactPoint(pointerAngle));
@@ -76,4 +78,7 @@ export class Pointer {
         return this.origin.getCenter();
     }
 
+    public erase(): void {
+        this.canvas.remove(this.line, this.selfLoop, ...this.arrowhead);
+    }
 }
