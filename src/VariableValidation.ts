@@ -18,19 +18,19 @@ const reservedWords = new Set([
     "typedef", "typeid", "typename", "union", "unsigned", "using", "virtual",
     "void", "volatile", "wchar_t", "while", "xor", "xor_eq",
     // Java
-    "abstract", "continue", "for", "new", "switch", "assert",
-    "default", "goto", "package", "synchronized", "boolean", "do", "if",
-    "private", "this", "break", "double", "implements", "protected", "throw",
-    "byte", "else", "import", "public", "throws", "case", "enum", "instanceof",
+    "abstract", "continue", "for", "new", "switch", "assert", "default",
+    "goto", "package", "synchronized", "boolean", "do", "if", "private",
+    "this", "break", "double", "implements", "protected", "throw", "byte",
+    "else", "import", "public", "throws", "case", "enum", "instanceof",
     "return", "transient", "catch", "extends", "int", "short", "try", "char",
     "final", "interface", "static", "void", "class", "finally", "long",
     "strictfp", "volatile", "const", "float", "native", "super",
     // Python
-    "False", "await", "else", "import", "pass", "None",
-    "break", "except", "in", "raise", "True", "class", "finally", "is",
-    "return", "and", "continue", "for", "lambda", "try", "as", "def", "from",
-    "nonlocal", "while", "assert", "del", "global", "not", "with", "async",
-    "elif", "if", "or", "yield",
+    "False", "await", "else", "import", "pass", "None", "break", "except",
+    "in", "raise", "True", "class", "finally", "is", "return", "and",
+    "continue", "for", "lambda", "try", "as", "def", "from", "nonlocal",
+    "while", "assert", "del", "global", "not", "with", "async", "elif", "if",
+    "or", "yield",
     // Other
     "NULL", "null",
 ]);
@@ -38,7 +38,7 @@ const reservedWords = new Set([
 export function validateVariableName(name: string, alreadyUsed: string[]): boolean {
 
     if (!varNameRe.test(name)) {
-        alert("Variable names must start with a letter and contain only letters and numbers.");
+        alert("Variable names must start with a letter or underscore and must contain only letters, numbers, and underscores.");
         return false;
     }
 
