@@ -52,9 +52,13 @@ export class Pointer {
             ({ x: x2, y: y2 } = this.destination.getHeadContactPoint(0));
 
             const size = Config.NODE_SIZE * 3;
-            this.selfLoop.set("path", [
-                <any>["m", x1, y1],
-                <any>["c", size , -size , -size * 3/2, -size, x2 - x1, 0]
+
+            this.selfLoop.set("path", <fabric.Point[]><unknown>[
+                // the fabric.js type declaration is incorrect, stating that this
+                // method expects a fabric.Point[], but it actually expects a string[][]
+                // denoting an SVG path
+                ["m", x1, y1],
+                ["c", size , -size , -size * 3/2, -size, x2 - x1, 0]
             ]);
 
         } else {
