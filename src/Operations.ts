@@ -7,12 +7,12 @@ export class CreateNode implements DSOperation {
     public type = "CreateNode";
     public value: number;
     public id: number;
-    public pointer: AssignPointer;
+    public assignSuboperation: AssignPointer;
 
-    constructor(value: number, id: number, pointer: AssignPointer) {
+    constructor(value: number, id: number, assignSuboperation: AssignPointer) {
         this.value = value;
         this.id = id;
-        this.pointer = pointer;
+        this.assignSuboperation = assignSuboperation;
     }
 }
 
@@ -27,13 +27,13 @@ export class CreatePointer implements DSOperation {
 
 export class AssignPointer implements DSOperation {
     public type = "AssignPointer";
-    public lhs: string;
-    public nodeId: number;
+    public pointer: string;
+    public newNodeId: number;
     public oldNodeId: number;
 
-    constructor(lhs: string, nodeId: number, oldNodeId: number) {
-        this.lhs = lhs;
-        this.nodeId = nodeId;
+    constructor(pointer: string, newNodeId: number, oldNodeId: number) {
+        this.pointer = pointer;
+        this.newNodeId = newNodeId;
         this.oldNodeId = oldNodeId;
     }
 }

@@ -54,15 +54,15 @@ export class LinkedList {
 
     public createNode(op: CreateNode): void {
         const node = new BoxNode(op.value, op.id, this.canvas,
-            this.getPointerFromString(op.pointer.lhs).getOriginLocation());
+            this.getPointerFromString(op.assignSuboperation.pointer).getOriginLocation());
         this.nodes[op.id] = node;
-        this.assignPointer(op.pointer);
+        this.assignPointer(op.assignSuboperation);
         this.draw();
     }
 
     public assignPointer(op: AssignPointer): void {
-        const lhsPointer = this.getPointerFromString(op.lhs);
-        lhsPointer.set(this.nodes[op.nodeId]);
+        const lhsPointer = this.getPointerFromString(op.pointer);
+        lhsPointer.set(this.nodes[op.newNodeId]);
         this.draw();
     }
 
@@ -73,7 +73,7 @@ export class LinkedList {
 
     public unCreateNode(op: CreateNode): void {
         // put the pointer back where it was
-        this.unAssignPointer(op.pointer);
+        this.unAssignPointer(op.assignSuboperation);
 
         // get rid of the node
         this.nodes[op.id].erase();
@@ -82,7 +82,7 @@ export class LinkedList {
     }
 
     public unAssignPointer(op: AssignPointer): void {
-        this.getPointerFromString(op.lhs).set(this.nodes[op.oldNodeId]);
+        this.getPointerFromString(op.pointer).set(this.nodes[op.oldNodeId]);
         this.draw();
     }
 
