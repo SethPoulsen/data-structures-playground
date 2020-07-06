@@ -5,7 +5,8 @@
         "removeComments": false,
         "preserveConstEnums": true,
         "outDir": ".build",
-        "allowJs": true
+        "allowJs": true,
+        "target": "es2015"
     },
     "include": [
         "src/*.ts",

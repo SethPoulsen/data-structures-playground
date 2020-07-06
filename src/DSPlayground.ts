@@ -1,5 +1,5 @@
 import { LinkedList } from "./LinkedList";
-
+import { validateVariableName } from "./VariableValidation";
 
 function setControlsBoxStyle(control: HTMLDivElement) {
     control.style.width = "33%";
@@ -102,8 +102,14 @@ export class DSPlayground {
 
         createPointerDiv.querySelector("button").addEventListener("click", () => {
             const inputEl = createPointerDiv.querySelector("input");
-            ll.createPointer(inputEl.value);
+            const pointerName = inputEl.value.trim();
             inputEl.value = "";
+
+            if (!validateVariableName(pointerName, ll.getAccessibleNames())) {
+                return;
+            }
+
+            ll.createPointer(pointerName);
             this.updateDropdownOptions(ll);
         });
 
