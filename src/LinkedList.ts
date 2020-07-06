@@ -3,11 +3,12 @@ import { Node } from "./Node";
 import { Variable } from "./Variable";
 import { Pointer } from "./Pointer";
 import { BoxNode } from "./BoxNode";
+import { CreateNode, CreatePointer, AssignPointer as AssignPointer } from "./Operations";
 
 export class LinkedList {
 
     private globalVars: { [key: string]: Variable };
-    private nodes: Node[];
+    private nodes: { [id: number]: Node };
     private canvas: fabric.Canvas;
 
     constructor(canvasEl: HTMLCanvasElement) {
@@ -31,8 +32,8 @@ export class LinkedList {
             this.globalVars[key].draw();
         }
 
-        for (const node of this.nodes) {
-            node.draw();
+        for (const id in this.nodes) {
+            this.nodes[id].draw();
         }
 
         this.canvas.renderAll();
@@ -46,22 +47,42 @@ export class LinkedList {
         return names;
     }
 
-    public createPointer(name: string): void {
-        this.globalVars[name] = new Variable(name, this.canvas);
+    public createPointer(op: CreatePointer): void {
+        this.globalVars[op.name] = new Variable(op.name, this.canvas);
         this.draw();
     }
 
-    public createNode(value: number, pointerToNode: string): void {
-        const ptr = this.getPointerFromString(pointerToNode);
-        const node = new BoxNode(value, this.canvas, ptr.getOriginLocation());
-        this.nodes.push(node);
-        ptr.set(node);
-
+    public createNode(op: CreateNode): void {
+        const node = new BoxNode(op.value, op.id, this.canvas,
+            this.getPointerFromString(op.assignSuboperation.pointer).getOriginLocation());
+        this.nodes[op.id] = node;
+        this.assignPointer(op.assignSuboperation);
         this.draw();
     }
 
-    public reassignPointer(lhs: string, rhs: string): void {
-        this.getPointerFromString(lhs).set(this.getPointerFromString(rhs).deref());
+    public assignPointer(op: AssignPointer): void {
+        const lhsPointer = this.getPointerFromString(op.pointer);
+        lhsPointer.set(this.nodes[op.newNodeId]);
+        this.draw();
+    }
+
+    public unCreatePointer(op: CreatePointer): void {
+        this.globalVars[op.name].erase();
+        delete this.globalVars[op.name];
+    }
+
+    public unCreateNode(op: CreateNode): void {
+        // put the pointer back where it was
+        this.unAssignPointer(op.assignSuboperation);
+
+        // get rid of the node
+        this.nodes[op.id].erase();
+        delete this.nodes[op.id];
+        this.draw();
+    }
+
+    public unAssignPointer(op: AssignPointer): void {
+        this.getPointerFromString(op.pointer).set(this.nodes[op.oldNodeId]);
         this.draw();
     }
 
@@ -77,4 +98,9 @@ export class LinkedList {
             throw Error("Only member pointers names 'next' are supported right now.");
         }
     }
+
+    public getNodeIdAt(pointer: string): number {
+        return this.getPointerFromString(pointer).deref()?.getId();
+    }
+
 }

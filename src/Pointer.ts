@@ -15,15 +15,18 @@ export class Pointer {
 
     constructor(origin: Node | Variable, canvas: fabric.Canvas) {
         this.origin = origin;
-        this.destination = null;
         this.canvas = canvas;
         this.line = makeLine();
         this.selfLoop = new fabric.Path("",{ fill: '', stroke: 'black', objectCaching: false, strokeWidth: 2 });
         this.arrowhead = [makeLine(), makeLine()];
-        canvas.add(this.line, ...this.arrowhead);
     }
 
     public set(nodePointedTo: Node): void {
+        if (!this.destination && nodePointedTo) {
+            this.canvas.add(this.line, ...this.arrowhead);
+        } else if (this.destination && !nodePointedTo) {
+            this.erase();
+        }
         this.destination = nodePointedTo;
 
         this.erase();
@@ -40,7 +43,7 @@ export class Pointer {
     }
 
     public draw(): void {
-        if (this.destination === null) return;
+        if (!this.destination) return;
 
         let x1, y1, x2, y2, pointerAngle;
         if (this.destination == this.origin) {
@@ -49,9 +52,13 @@ export class Pointer {
             ({ x: x2, y: y2 } = this.destination.getHeadContactPoint(0));
 
             const size = Config.NODE_SIZE * 3;
-            this.selfLoop.set("path", [
-                <any>["m", x1, y1],
-                <any>["c", size , -size , -size * 3/2, -size, x2 - x1, 0]
+
+            this.selfLoop.set("path", <fabric.Point[]><unknown>[
+                // the fabric.js type declaration is incorrect, stating that this
+                // method expects a fabric.Point[], but it actually expects a string[][]
+                // denoting an SVG path
+                ["m", x1, y1],
+                ["c", size , -size , -size * 3/2, -size, x2 - x1, 0]
             ]);
 
         } else {
@@ -81,4 +88,5 @@ export class Pointer {
     public erase(): void {
         this.canvas.remove(this.line, this.selfLoop, ...this.arrowhead);
     }
+
 }
