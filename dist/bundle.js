@@ -31925,6 +31925,71 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/BoxNode.ts":
+/*!************************!*\
+  !*** ./src/BoxNode.ts ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BoxNode = void 0;
+const fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+const Node_1 = __webpack_require__(/*! ./Node */ "./src/Node.ts");
+const Config = __webpack_require__(/*! ./Config */ "./src/Config.ts");
+const Utils_1 = __webpack_require__(/*! ./Utils */ "./src/Utils.ts");
+class BoxNode extends Node_1.Node {
+    createFabricObjects() {
+        const box = new fabric_1.fabric.Rect({
+            width: 2 * Config.NODE_SIZE,
+            height: Config.NODE_SIZE,
+            fill: '#00000000',
+            stroke: 'black',
+            strokeWidth: 2,
+        });
+        const divider = Utils_1.makeLine({ x: 0, y: -Config.NODE_SIZE / 2 }, { x: 0, y: Config.NODE_SIZE / 2 });
+        const dot = new fabric_1.fabric.Circle({
+            radius: Config.NODE_SIZE / 8,
+            fill: 'black',
+            stroke: 'black',
+            strokeWidth: 2,
+            left: Config.NODE_SIZE / 2,
+        });
+        const text = new fabric_1.fabric.IText(this.data.toString(), {
+            fill: '#black',
+            left: -Config.NODE_SIZE / 2,
+        });
+        return [box, divider, dot, text];
+    }
+    getHeadContactPoint(angle) {
+        return Utils_1.getBoxIntersection(this.getCenter(), angle + Math.PI, this.representation.width, this.representation.height);
+    }
+    getTailContactPoint() {
+        return this.getDotLocation();
+    }
+    getAngleTo(other) {
+        return Utils_1.calculateAngle(this.getDotLocation(), other.getCenter());
+    }
+    getCenter() {
+        return {
+            x: this.representation.left,
+            y: this.representation.top,
+        };
+    }
+    getDotLocation() {
+        return {
+            x: this.representation.left + Config.NODE_SIZE / 2,
+            y: this.representation.top,
+        };
+    }
+}
+exports.BoxNode = BoxNode;
+
+
+/***/ }),
+
 /***/ "./src/Config.ts":
 /*!***********************!*\
   !*** ./src/Config.ts ***!
@@ -31934,7 +31999,7 @@ module.exports = g;
 
 "use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.NODE_SPACE = exports.NODE_SIZE = exports.LIST_X = exports.LIST_Y = void 0;
 exports.LIST_Y = 100;
 exports.LIST_X = 100;
@@ -31953,20 +32018,24 @@ exports.NODE_SPACE = 200;
 
 "use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.DSPlayground = void 0;
-var LinkedList_1 = __webpack_require__(/*! ./LinkedList */ "./src/LinkedList.ts");
+const LinkedList_1 = __webpack_require__(/*! ./LinkedList */ "./src/LinkedList.ts");
+const VariableValidation_1 = __webpack_require__(/*! ./VariableValidation */ "./src/VariableValidation.ts");
+const Operations_1 = __webpack_require__(/*! ./Operations */ "./src/Operations.ts");
+const IdGenerator_1 = __webpack_require__(/*! ./IdGenerator */ "./src/IdGenerator.ts");
 function setControlsBoxStyle(control) {
     control.style.width = "33%";
     control.style.height = "200px";
     control.style.border = "1px solid black";
     control.style.padding = "10px";
 }
-var DSPlayground = /** @class */ (function () {
-    function DSPlayground(root) {
-        var _this = this;
+class DSPlayground {
+    constructor(root) {
+        this.undoStack = [];
+        this.redoStack = [];
         console.log("Made a new DSPlayground!");
-        var canvasEl = document.createElement("canvas");
+        const canvasEl = document.createElement("canvas");
         canvasEl.width = 1000;
         canvasEl.height = 500;
         canvasEl.style.width = canvasEl.width + "px";
@@ -31977,52 +32046,195 @@ var DSPlayground = /** @class */ (function () {
         this.controls.style.width = "1000px";
         this.controls.style.height = "200px";
         this.controls.style.display = "flex";
-        var createNodeDiv = this.createControlsDiv("\n            <div style=\"font-size: 1.2em; padding: 2px;\" >\n                <u> Create a new node </u>\n            </div> <div></div>\n            <div style=\"padding: 2px;\">\n                Create a node with value\n                <input style=\"padding: 2px; width: 100px;\" type=\"number\">\n                </input>\n            </div>\n            <div style=\"padding: 2px;\">\n                which is pointed to by\n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\">\n                <button id=\"createNodeButton\"\n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\">\n                    Create!\n                </button>\n            </div\n        ");
-        var createPointerDiv = this.createControlsDiv("\n            <div style=\"font-size: 1.2em; padding: 2px;\" >\n                <u> Create a new Pointer </u>\n            </div> <div></div>\n            <div style=\"padding: 2px;\">\n                Create a new pointer called\n                <input style=\"padding: 2px; width: 100px;\" >\n                </input>\n            </div>\n            <div style=\"padding: 2px;\">\n                <button id=\"createPointerButton\"\n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\">\n                    Create!\n                </button>\n            </div\n        ");
-        var reassignPointerDiv = this.createControlsDiv("\n            <div style=\"font-size: 1.2em; padding: 2px;\" >\n                <u> Move/Reassign a pointer </u>\n            </div> <div></div>\n            <div style=\"padding: 2px;\">\n                Reassign the pointer\n                <select> </select>\n\n            </div>\n            <div style=\"padding: 2px;\">\n                to point to the same location as the pointer\n                <select> </select>\n            </div>\n            <div style=\"padding: 2px;\">\n                <button id=\"reassignPointerButton\"\n                    style=\"float:right; background-color: #87CEFA; height: 30px; width: 100px\">\n                    Reassign!\n                </button>\n            </div\n        ");
+        const createNodeDiv = this.createControlsDiv(`
+            <div style="font-size: 1.2em; padding: 2px;" >
+                <u> Create a new node </u>
+            </div> <div></div>
+            <div style="padding: 2px;">
+                Create a node with value
+                <input style="padding: 2px; width: 100px;" type="number">
+                </input>
+            </div>
+            <div style="padding: 2px;">
+                which is pointed to by
+                <select> </select>
+            </div>
+            <div style="padding: 2px;">
+                <button id="createNodeButton"
+                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
+                    Create!
+                </button>
+            </div
+        `);
+        const createPointerDiv = this.createControlsDiv(`
+            <div style="font-size: 1.2em; padding: 2px;" >
+                <u> Create a new Pointer </u>
+            </div> <div></div>
+            <div style="padding: 2px;">
+                Create a new pointer called
+                <input style="padding: 2px; width: 100px;" >
+                </input>
+            </div>
+            <div style="padding: 2px;">
+                <button id="createPointerButton"
+                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
+                    Create!
+                </button>
+            </div
+        `);
+        const assignPointerDiv = this.createControlsDiv(`
+            <div style="font-size: 1.2em; padding: 2px;" >
+                <u> Assign a pointer </u>
+            </div> <div></div>
+            <div style="padding: 2px;">
+                Assign the pointer
+                <select> </select>
+
+            </div>
+            <div style="padding: 2px;">
+                to point to the same location as the pointer
+                <select> </select>
+            </div>
+            <div style="padding: 2px;">
+                <button id="assignPointerButton"
+                    style="float:right; background-color: #87CEFA; height: 30px; width: 100px">
+                    Assign!
+                </button>
+            </div
+        `);
         // TODO: create another controls box for the user to input a list of numbers
         // to initialize the list
-        var ll = new LinkedList_1.LinkedList(canvasEl);
-        createPointerDiv.querySelector("button").addEventListener("click", function () {
-            var inputEl = createPointerDiv.querySelector("input");
-            ll.createPointer(inputEl.value);
+        this.createControlsDiv(`
+            <div style="padding: 2px;">
+                <button id="undoButton"
+                    style="background-color: #87CEFA; height: 30px; width: 100px">
+                    Undo
+                </button>
+                <button id="redoButton"
+                    style="background-color: #87CEFA; height: 30px; width: 100px">
+                    Redo
+            </button>
+            </div
+        `);
+        this.linkedList = new LinkedList_1.LinkedList(canvasEl);
+        createPointerDiv.querySelector("button").addEventListener("click", () => {
+            const inputEl = createPointerDiv.querySelector("input");
+            const pointerName = inputEl.value.trim();
             inputEl.value = "";
-            _this.updateDropdownOptions(ll);
-        });
-        createNodeDiv.querySelector("button").addEventListener("click", function () {
-            var inputEl = createNodeDiv.querySelector("input");
-            var selectEl = createNodeDiv.querySelector("select");
-            var pointerName = selectEl.selectedOptions[0].value;
-            ll.createNode(parseInt(inputEl.value), pointerName);
+            if (!VariableValidation_1.validateVariableName(pointerName, this.linkedList.getAccessibleNames())) {
+                return;
+            }
+            this.performOperation(new Operations_1.CreatePointer(pointerName));
             inputEl.value = "";
-            _this.updateDropdownOptions(ll);
+            this.updateDropdownOptions(this.linkedList);
         });
-        reassignPointerDiv.querySelector("button").addEventListener("click", function () {
-            var selectEls = reassignPointerDiv.querySelectorAll("select");
-            var lhsPointer = selectEls[0].selectedOptions[0].value;
-            var rhsPointer = selectEls[1].selectedOptions[0].value;
-            ll.reassignPointer(lhsPointer, rhsPointer);
-            _this.updateDropdownOptions(ll);
+        createNodeDiv.querySelector("button").addEventListener("click", () => {
+            const inputEl = createNodeDiv.querySelector("input");
+            const selectEl = createNodeDiv.querySelector("select");
+            const pointerName = selectEl.selectedOptions[0].value;
+            const newNodeId = IdGenerator_1.generateFreshID();
+            const assignPointer = new Operations_1.AssignPointer(pointerName, newNodeId, this.linkedList.getNodeIdAt(pointerName));
+            const operation = new Operations_1.CreateNode(parseInt(inputEl.value), newNodeId, assignPointer);
+            this.performOperation(operation);
+            inputEl.value = "";
+            this.updateDropdownOptions(this.linkedList);
+        });
+        assignPointerDiv.querySelector("button").addEventListener("click", () => {
+            const selectEls = assignPointerDiv.querySelectorAll("select");
+            const lhsPointer = selectEls[0].selectedOptions[0].value;
+            const rhsPointer = selectEls[1].selectedOptions[0].value;
+            const operation = new Operations_1.AssignPointer(lhsPointer, this.linkedList.getNodeIdAt(rhsPointer), this.linkedList.getNodeIdAt(lhsPointer));
+            this.performOperation(operation);
+            this.updateDropdownOptions(this.linkedList);
+        });
+        this.undoButton = document.getElementById("undoButton");
+        this.undoButton.addEventListener("click", () => {
+            const lastOp = this.undoStack.pop();
+            if (!lastOp) {
+                return;
+            }
+            this.undoOperation(lastOp);
+            this.redoStack.push(lastOp);
+        });
+        this.redoButton = document.getElementById("redoButton");
+        this.redoButton.addEventListener("click", () => {
+            const lastOp = this.redoStack.pop();
+            if (!lastOp) {
+                return;
+            }
+            this.performOperationInternal(lastOp);
+            this.undoStack.push(lastOp);
         });
     }
-    DSPlayground.prototype.createControlsDiv = function (html) {
-        var div = document.createElement("div");
+    createControlsDiv(html) {
+        const div = document.createElement("div");
         setControlsBoxStyle(div);
         div.innerHTML = html;
         this.controls.appendChild(div);
         return div;
-    };
-    DSPlayground.prototype.updateDropdownOptions = function (ll) {
-        var options = "";
-        for (var _i = 0, _a = ll.getAccessibleNames(); _i < _a.length; _i++) {
-            var varName = _a[_i];
-            options += "<option>" + varName + "</option>";
+    }
+    updateDropdownOptions(ll) {
+        let options = "";
+        for (const varName of ll.getAccessibleNames()) {
+            options += `<option>${varName}</option>`;
         }
-        this.controls.querySelectorAll("select").forEach(function (selectEl) { return selectEl.innerHTML = options; });
-    };
-    return DSPlayground;
-}());
+        this.controls.querySelectorAll("select").forEach(selectEl => selectEl.innerHTML = options);
+    }
+    performOperation(op) {
+        this.performOperationInternal(op);
+        this.redoStack = []; // TODO also grey out UI to show its not usable
+        this.undoStack.push(op);
+    }
+    undoOperation(op) {
+        if (op.type === "CreateNode") {
+            this.linkedList.unCreateNode(op);
+        }
+        else if (op.type === "CreatePointer") {
+            this.linkedList.unCreatePointer(op);
+        }
+        else if (op.type === "AssignPointer") {
+            this.linkedList.unAssignPointer(op);
+        }
+        else {
+            throw (new Error("Unsupported Operation"));
+        }
+    }
+    performOperationInternal(op) {
+        if (op.type === "CreateNode") {
+            this.linkedList.createNode(op);
+        }
+        else if (op.type === "CreatePointer") {
+            this.linkedList.createPointer(op);
+        }
+        else if (op.type === "AssignPointer") {
+            this.linkedList.assignPointer(op);
+        }
+        else {
+            throw (new Error("Unsupported Operation"));
+        }
+    }
+}
 exports.DSPlayground = DSPlayground;
+
+
+/***/ }),
+
+/***/ "./src/IdGenerator.ts":
+/*!****************************!*\
+  !*** ./src/IdGenerator.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateFreshID = void 0;
+let idCounter = 1;
+function generateFreshID() {
+    return idCounter++;
+}
+exports.generateFreshID = generateFreshID;
 
 
 /***/ }),
@@ -32036,14 +32248,13 @@ exports.DSPlayground = DSPlayground;
 
 "use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.LinkedList = void 0;
-var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
-var Node_1 = __webpack_require__(/*! ./Node */ "./src/Node.ts");
-var Variable_1 = __webpack_require__(/*! ./Variable */ "./src/Variable.ts");
-var LinkedList = /** @class */ (function () {
-    function LinkedList(canvasEl) {
-        var _this = this;
+const fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+const Variable_1 = __webpack_require__(/*! ./Variable */ "./src/Variable.ts");
+const BoxNode_1 = __webpack_require__(/*! ./BoxNode */ "./src/BoxNode.ts");
+class LinkedList {
+    constructor(canvasEl) {
         this.canvas = new fabric_1.fabric.Canvas(canvasEl);
         this.canvas.selection = false;
         // this allows us to draw circles using the coordinates of their centers
@@ -32051,41 +32262,57 @@ var LinkedList = /** @class */ (function () {
         this.nodes = [];
         this.globalVars = {};
         this.draw();
-        this.canvas.on('object:moving', function () { return _this.draw(); });
+        this.canvas.on('object:moving', () => this.draw());
     }
-    LinkedList.prototype.draw = function () {
-        for (var key in this.globalVars) {
+    draw() {
+        for (const key in this.globalVars) {
             this.globalVars[key].draw();
         }
-        for (var _i = 0, _a = this.nodes; _i < _a.length; _i++) {
-            var node = _a[_i];
-            node.draw();
+        for (const id in this.nodes) {
+            this.nodes[id].draw();
         }
         this.canvas.renderAll();
-    };
-    LinkedList.prototype.getAccessibleNames = function () {
-        var names = [];
-        for (var key in this.globalVars) {
+    }
+    getAccessibleNames() {
+        let names = [];
+        for (const key in this.globalVars) {
             names = names.concat(this.globalVars[key].getAccessibleNames());
         }
         return names;
-    };
-    LinkedList.prototype.createPointer = function (name) {
-        this.globalVars[name] = new Variable_1.Variable(name, this.canvas);
+    }
+    createPointer(op) {
+        this.globalVars[op.name] = new Variable_1.Variable(op.name, this.canvas);
         this.draw();
-    };
-    LinkedList.prototype.createNode = function (value, pointerToNode) {
-        var node = new Node_1.Node(value, this.canvas);
-        this.nodes.push(node);
-        this.getPointerFromString(pointerToNode).set(node);
+    }
+    createNode(op) {
+        const node = new BoxNode_1.BoxNode(op.value, op.id, this.canvas, this.getPointerFromString(op.assignSuboperation.pointer).getOriginLocation());
+        this.nodes[op.id] = node;
+        this.assignPointer(op.assignSuboperation);
         this.draw();
-    };
-    LinkedList.prototype.reassignPointer = function (lhs, rhs) {
-        this.getPointerFromString(lhs).set(this.getPointerFromString(rhs).deref());
+    }
+    assignPointer(op) {
+        const lhsPointer = this.getPointerFromString(op.pointer);
+        lhsPointer.set(this.nodes[op.newNodeId]);
         this.draw();
-    };
-    LinkedList.prototype.getPointerFromString = function (str) {
-        var _a = str.split("->"), firstToken = _a[0], next = _a[1];
+    }
+    unCreatePointer(op) {
+        this.globalVars[op.name].erase();
+        delete this.globalVars[op.name];
+    }
+    unCreateNode(op) {
+        // put the pointer back where it was
+        this.unAssignPointer(op.assignSuboperation);
+        // get rid of the node
+        this.nodes[op.id].erase();
+        delete this.nodes[op.id];
+        this.draw();
+    }
+    unAssignPointer(op) {
+        this.getPointerFromString(op.pointer).set(this.nodes[op.oldNodeId]);
+        this.draw();
+    }
+    getPointerFromString(str) {
+        const [firstToken, next] = str.split("->");
         if (!(firstToken in this.globalVars)) {
             throw Error("Invalid string; first token is not a global variable");
         }
@@ -32098,9 +32325,12 @@ var LinkedList = /** @class */ (function () {
         else {
             throw Error("Only member pointers names 'next' are supported right now.");
         }
-    };
-    return LinkedList;
-}());
+    }
+    getNodeIdAt(pointer) {
+        var _a;
+        return (_a = this.getPointerFromString(pointer).deref()) === null || _a === void 0 ? void 0 : _a.getId();
+    }
+}
 exports.LinkedList = LinkedList;
 
 
@@ -32115,57 +32345,79 @@ exports.LinkedList = LinkedList;
 
 "use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Node = void 0;
-var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
-var Pointer_1 = __webpack_require__(/*! ./Pointer */ "./src/Pointer.ts");
-var Config = __webpack_require__(/*! ./Config */ "./src/Config.ts");
-var Node = /** @class */ (function () {
-    function Node(data, canvas) {
+const fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+const Pointer_1 = __webpack_require__(/*! ./Pointer */ "./src/Pointer.ts");
+const Config = __webpack_require__(/*! ./Config */ "./src/Config.ts");
+class Node {
+    constructor(data, id, canvas, pointerOrigin) {
         this.data = data;
+        this.canvas = canvas;
         this.next = new Pointer_1.Pointer(this, canvas);
-        var circle = new fabric_1.fabric.Circle({
-            radius: Config.NODE_SIZE,
-            fill: '#00000000',
-            stroke: 'black',
-            strokeWidth: 2
-        });
-        var text = new fabric_1.fabric.IText(this.data.toString(), {
-            fill: '#black',
-            evented: false,
-            selectable: false
-        });
-        this.representation = new fabric_1.fabric.Group([circle, text], {
+        this.id = id;
+        this.representation = new fabric_1.fabric.Group(this.createFabricObjects(), {
             hasControls: false,
             hasBorders: false,
             hoverCursor: "grab",
-            moveCursor: "grabbing"
+            moveCursor: "grabbing",
+            left: Math.min(pointerOrigin.x + Config.NODE_SPACE, canvas.getWidth() - Config.NODE_SIZE),
+            top: pointerOrigin.y,
         });
         canvas.add(this.representation);
-        this.representation.center();
     }
-    Node.prototype.draw = function () {
+    draw() {
         this.next.draw();
-    };
-    /**
-     * Return the location where the pointer touches this node.
-     * @param angle the angle at which the pointer will be drawn, in radians.
-     */
-    Node.prototype.getContactPoint = function (angle) {
-        return {
-            x: this.representation.left + Math.cos(angle) * Config.NODE_SIZE,
-            y: this.representation.top + Math.sin(angle) * Config.NODE_SIZE
-        };
-    };
-    Node.prototype.getCenter = function () {
-        return {
-            x: this.representation.left,
-            y: this.representation.top
-        };
-    };
-    return Node;
-}());
+    }
+    erase() {
+        this.canvas.remove(this.representation);
+        this.next.erase();
+    }
+    getId() {
+        return this.id;
+    }
+}
 exports.Node = Node;
+
+
+/***/ }),
+
+/***/ "./src/Operations.ts":
+/*!***************************!*\
+  !*** ./src/Operations.ts ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AssignPointer = exports.CreatePointer = exports.CreateNode = void 0;
+class CreateNode {
+    constructor(value, id, assignSuboperation) {
+        this.type = "CreateNode";
+        this.value = value;
+        this.id = id;
+        this.assignSuboperation = assignSuboperation;
+    }
+}
+exports.CreateNode = CreateNode;
+class CreatePointer {
+    constructor(name) {
+        this.type = "CreatePointer";
+        this.name = name;
+    }
+}
+exports.CreatePointer = CreatePointer;
+class AssignPointer {
+    constructor(pointer, newNodeId, oldNodeId) {
+        this.type = "AssignPointer";
+        this.pointer = pointer;
+        this.newNodeId = newNodeId;
+        this.oldNodeId = oldNodeId;
+    }
+}
+exports.AssignPointer = AssignPointer;
 
 
 /***/ }),
@@ -32179,51 +32431,79 @@ exports.Node = Node;
 
 "use strict";
 
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Pointer = void 0;
-var Utils_1 = __webpack_require__(/*! ./Utils */ "./src/Utils.ts");
-var Pointer = /** @class */ (function () {
-    function Pointer(origin, canvas) {
+const fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+const Utils_1 = __webpack_require__(/*! ./Utils */ "./src/Utils.ts");
+const Config = __webpack_require__(/*! ./Config */ "./src/Config.ts");
+class Pointer {
+    constructor(origin, canvas) {
         this.origin = origin;
-        this.destination = null;
+        this.canvas = canvas;
         this.line = Utils_1.makeLine();
+        this.selfLoop = new fabric_1.fabric.Path("", { fill: '', stroke: 'black', objectCaching: false, strokeWidth: 2 });
         this.arrowhead = [Utils_1.makeLine(), Utils_1.makeLine()];
-        canvas.add.apply(canvas, __spreadArrays([this.line], this.arrowhead));
     }
-    Pointer.prototype.set = function (nodePointedTo) {
+    set(nodePointedTo) {
+        if (!this.destination && nodePointedTo) {
+            this.canvas.add(this.line, ...this.arrowhead);
+        }
+        else if (this.destination && !nodePointedTo) {
+            this.erase();
+        }
         this.destination = nodePointedTo;
-    };
-    Pointer.prototype.deref = function () {
+        this.erase();
+        if (this.destination == this.origin) {
+            this.canvas.add(this.selfLoop, ...this.arrowhead);
+        }
+        else if (this.destination) {
+            this.canvas.add(this.line, ...this.arrowhead);
+        }
+    }
+    deref() {
         return this.destination;
-    };
-    Pointer.prototype.draw = function () {
-        if (this.destination === null)
+    }
+    draw() {
+        if (!this.destination)
             return;
-        var pointerAngle = Math.atan2(this.destination.getCenter().y - this.origin.getCenter().y, this.destination.getCenter().x - this.origin.getCenter().x);
-        var _a = this.origin.getContactPoint(pointerAngle), x1 = _a.x, y1 = _a.y;
-        var _b = this.destination.getContactPoint(pointerAngle + Math.PI), x2 = _b.x, y2 = _b.y;
-        var arrowAngles = [pointerAngle + 3 * Math.PI / 4, pointerAngle - 3 * Math.PI / 4];
-        this.line.set({ x1: x1, x2: x2, y1: y1, y2: y2 });
-        var arrowLength = 20;
-        for (var _i = 0, _c = [0, 1]; _i < _c.length; _i++) {
-            var i = _c[_i];
+        let x1, y1, x2, y2, pointerAngle;
+        if (this.destination == this.origin) {
+            pointerAngle = 0.85;
+            ({ x: x1, y: y1 } = this.origin.getTailContactPoint(0));
+            ({ x: x2, y: y2 } = this.destination.getHeadContactPoint(0));
+            const size = Config.NODE_SIZE * 3;
+            this.selfLoop.set("path", [
+                // the fabric.js type declaration is incorrect, stating that this
+                // method expects a fabric.Point[], but it actually expects a string[][]
+                // denoting an SVG path
+                ["m", x1, y1],
+                ["c", size, -size, -size * 3 / 2, -size, x2 - x1, 0]
+            ]);
+        }
+        else {
+            pointerAngle = this.origin.getAngleTo(this.destination);
+            ({ x: x1, y: y1 } = this.origin.getTailContactPoint(pointerAngle));
+            ({ x: x2, y: y2 } = this.destination.getHeadContactPoint(pointerAngle));
+            this.line.set({ x1, x2, y1, y2 });
+        }
+        const arrowLength = 20;
+        const arrowAngles = [pointerAngle + 0.85 * Math.PI, pointerAngle - 0.85 * Math.PI];
+        for (const i of [0, 1]) {
             this.arrowhead[i].set({
                 x1: x2 + arrowLength * Math.cos(arrowAngles[i]),
                 y1: y2 + arrowLength * Math.sin(arrowAngles[i]),
-                x2: x2,
-                y2: y2
+                x2,
+                y2,
             });
         }
-    };
-    return Pointer;
-}());
+    }
+    getOriginLocation() {
+        return this.origin.getCenter();
+    }
+    erase() {
+        this.canvas.remove(this.line, this.selfLoop, ...this.arrowhead);
+    }
+}
 exports.Pointer = Pointer;
 
 
@@ -32238,20 +32518,41 @@ exports.Pointer = Pointer;
 
 "use strict";
 
-exports.__esModule = true;
-exports.makeLine = void 0;
-var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
-function makeLine(coords) {
-    if (coords === void 0) { coords = [0, 0, 0, 0]; }
-    return new fabric_1.fabric.Line(coords, {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getBoxIntersection = exports.calculateAngle = exports.makeLine = void 0;
+const fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+const origin = { x: 0, y: 0 };
+function makeLine(start = origin, end = origin) {
+    return new fabric_1.fabric.Line([start.x, start.y, end.x, end.y], {
         fill: 'black',
         stroke: 'black',
         strokeWidth: 2,
         selectable: false,
-        evented: false
+        evented: false,
     });
 }
 exports.makeLine = makeLine;
+function calculateAngle(p1, p2) {
+    return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+}
+exports.calculateAngle = calculateAngle;
+/**
+ * Calculates the point at which a ray drawn from the center of a box intersects the box boundrary.
+ * @param center center of the box
+ * @param angle angle at which ray is drawn, with respect to the positive x-axis
+ * @param width width of the box
+ * @param height height of the box
+ */
+function getBoxIntersection(center, angle, width, height) {
+    // r is distance from center to contact point
+    // take minimum to determine if it intersects the vertical or horizontal boundary first
+    const r = Math.min(Math.abs((width / 2) / Math.cos(angle)), Math.abs((height / 2) / Math.sin(angle)));
+    return {
+        x: center.x + Math.cos(angle) * r,
+        y: center.y + Math.sin(angle) * r
+    };
+}
+exports.getBoxIntersection = getBoxIntersection;
 
 
 /***/ }),
@@ -32265,15 +32566,17 @@ exports.makeLine = makeLine;
 
 "use strict";
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Variable = void 0;
-var fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
-var Pointer_1 = __webpack_require__(/*! ./Pointer */ "./src/Pointer.ts");
-var Variable = /** @class */ (function () {
-    function Variable(name, canvas) {
+const fabric_1 = __webpack_require__(/*! fabric */ "./node_modules/fabric/dist/fabric.js");
+const Pointer_1 = __webpack_require__(/*! ./Pointer */ "./src/Pointer.ts");
+const Utils_1 = __webpack_require__(/*! ./Utils */ "./src/Utils.ts");
+class Variable {
+    constructor(name, canvas) {
         this.name = name;
+        this.canvas = canvas;
         this.pointer = new Pointer_1.Pointer(this, canvas);
-        var text = new fabric_1.fabric.IText(this.name, {
+        const text = new fabric_1.fabric.IText(this.name, {
             fill: '#black',
             evented: false,
             selectable: false
@@ -32282,43 +32585,110 @@ var Variable = /** @class */ (function () {
             hasControls: false,
             hasBorders: false,
             hoverCursor: "grab",
-            moveCursor: "grabbing"
+            moveCursor: "grabbing",
+            left: canvas.getWidth() * (0.8 * Math.random() + 0.1),
+            top: canvas.getHeight() * (0.8 * Math.random() + 0.1),
         });
         canvas.add(this.representation);
-        this.representation.center();
     }
-    Variable.prototype.getAccessibleNames = function () {
-        var pointers = [this.name];
-        if (this.pointer.deref() !== null) {
+    getAccessibleNames() {
+        const pointers = [this.name];
+        if (this.pointer.deref()) {
             pointers.push(this.name + "->next");
         }
         return pointers;
-    };
-    Variable.prototype.draw = function () {
+    }
+    draw() {
         this.pointer.draw();
-    };
+    }
     /**
      * Return the location where the pointer touches this variable on the canvas.
      * @param angle the angle at which the pointer will be drawn, in radians.
      */
-    Variable.prototype.getContactPoint = function (angle) {
-        // r is distance from center to contact point
-        // take minimum to determine if it intersects the vertical or horizontal boundary first
-        var r = Math.min(Math.abs((this.representation.width / 2) / Math.cos(angle)), Math.abs((this.representation.height / 2) / Math.sin(angle)));
-        return {
-            x: this.representation.left + Math.cos(angle) * r,
-            y: this.representation.top + Math.sin(angle) * r
-        };
-    };
-    Variable.prototype.getCenter = function () {
+    getTailContactPoint(angle) {
+        return Utils_1.getBoxIntersection(this.getCenter(), angle, this.representation.width, this.representation.height);
+    }
+    getAngleTo(other) {
+        return Utils_1.calculateAngle(this.getCenter(), other.getCenter());
+    }
+    getCenter() {
         return {
             x: this.representation.left,
-            y: this.representation.top
+            y: this.representation.top,
         };
-    };
-    return Variable;
-}());
+    }
+    erase() {
+        this.canvas.remove(this.representation);
+        this.pointer.erase();
+    }
+}
 exports.Variable = Variable;
+
+
+/***/ }),
+
+/***/ "./src/VariableValidation.ts":
+/*!***********************************!*\
+  !*** ./src/VariableValidation.ts ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.validateVariableName = void 0;
+const varNameRe = /[a-zA-Z_][a-zA-Z0-9_]*/i;
+const reservedWords = new Set([
+    // C++
+    "alignas", "alignof", "and", "and_eq", "asm", "atomic_cancel",
+    "atomic_commit", "atomic_noexcept", "auto", "bitand", "bitor", "bool",
+    "break", "case", "catch", "char", "char8_t", "char16_t", "char32_t",
+    "class", "compl", "concept", "const", "consteval", "constexpr", "constinit",
+    "const_cast", "continue", "co_await", "co_return", "co_yield",
+    "decltype", "default", "delete", "do", "double", "dynamic_cast", "else",
+    "enum", "explicit", "export", "extern", "false", "float", "for", "friend",
+    "goto", "if", "inline", "int", "long", "mutable", "namespace", "new",
+    "noexcept", "not", "not_eq", "nullptr", "operator", "or", "or_eq",
+    "private", "protected", "public", "reflexpr", "register",
+    "reinterpret_cast", "requires", "return", "short", "signed", "sizeof",
+    "static", "static_assert", "static_cast", "struct", "switch",
+    "synchronized", "template", "this", "thread_local", "throw", "true", "try",
+    "typedef", "typeid", "typename", "union", "unsigned", "using", "virtual",
+    "void", "volatile", "wchar_t", "while", "xor", "xor_eq",
+    // Java
+    "abstract", "continue", "for", "new", "switch", "assert", "default",
+    "goto", "package", "synchronized", "boolean", "do", "if", "private",
+    "this", "break", "double", "implements", "protected", "throw", "byte",
+    "else", "import", "public", "throws", "case", "enum", "instanceof",
+    "return", "transient", "catch", "extends", "int", "short", "try", "char",
+    "final", "interface", "static", "void", "class", "finally", "long",
+    "strictfp", "volatile", "const", "float", "native", "super",
+    // Python
+    "False", "await", "else", "import", "pass", "None", "break", "except",
+    "in", "raise", "True", "class", "finally", "is", "return", "and",
+    "continue", "for", "lambda", "try", "as", "def", "from", "nonlocal",
+    "while", "assert", "del", "global", "not", "with", "async", "elif", "if",
+    "or", "yield",
+    // Other
+    "NULL", "null",
+]);
+function validateVariableName(name, alreadyUsed) {
+    if (!varNameRe.test(name)) {
+        alert("Variable names must start with a letter or underscore and must contain only letters, numbers, and underscores.");
+        return false;
+    }
+    if (reservedWords.has(name)) {
+        alert(name + " is a reserved word. Please pick another variable name.");
+        return false;
+    }
+    if (alreadyUsed.indexOf(name) !== -1) {
+        alert("That variable name is already in use!");
+        return false;
+    }
+    return true;
+}
+exports.validateVariableName = validateVariableName;
 
 
 /***/ }),
